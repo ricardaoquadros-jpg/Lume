@@ -1,0 +1,39 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+error_log
+
+# PHP
+vendor/
+composer.lock
+
+# Temporary files
+*.tmp
+*.temp
+
+# Session files
+sess_*
+
+# Uploads (if sensitive)
+uploads/*.tmp
+
+# Database dumps
+*.sql.gz
+*.sql.bak
+
+# n8n credentials (keep workflow but not credentials)
+n8n_credentials.json

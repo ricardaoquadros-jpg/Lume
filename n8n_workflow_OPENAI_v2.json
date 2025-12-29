@@ -1,0 +1,187 @@
+{
+    "name": "Lume - Voice OpenAI (Fixed)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "lume-voice-openai",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1.1,
+            "position": [
+                240,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "text",
+                "options": {
+                    "language": "pt"
+                }
+            },
+            "id": "whisper",
+            "name": "OpenAI Whisper",
+            "type": "@n8n/n8n-nodes-langchain.openAi",
+            "typeVersion": 1,
+            "position": [
+                440,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "VOCE_VAI_CRIAR_ISSO",
+                    "name": "OpenAI API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": "gpt-3.5-turbo",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "role": "system",
+                            "message": "Você é um assistente financeiro. Analise a frase e extraia: descrição, valor (em reais), categoria (Alimentação, Transporte, Lazer, Contas, Salário, Extra, Outros), tipo (income ou expense). Retorne APENAS um JSON válido: {\"description\":\"...\",\"amount\":0.00,\"category\":\"...\",\"type\":\"expense\"}"
+                        },
+                        {
+                            "role": "user",
+                            "message": "={{ $json.text }}"
+                        }
+                    ]
+                },
+                "options": {
+                    "temperature": 0.3
+                }
+            },
+            "id": "gpt",
+            "name": "GPT Analysis",
+            "type": "@n8n/n8n-nodes-langchain.openAi",
+            "typeVersion": 1,
+            "position": [
+                640,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "VOCE_VAI_CRIAR_ISSO",
+                    "name": "OpenAI API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const response = items[0].json.message.content;\nconst data = JSON.parse(response.replace(/```json\\n?|```/g, '').trim());\nconst userId = $('Webhook').first().json.body.user_id;\n\nreturn {\n  json: {\n    user_id: userId,\n    description: data.description,\n    amount: parseFloat(data.amount),\n    category: data.category,\n    type: data.type,\n    transaction_date: new Date().toISOString().split('T')[0]\n  }\n};"
+            },
+            "id": "parse",
+            "name": "Parse JSON",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                840,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:8000/process_voice.php",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"user_id\": {{ $json.user_id }},\n  \"description\": \"{{ $json.description }}\",\n  \"amount\": {{ $json.amount }},\n  \"category\": \"{{ $json.category }}\",\n  \"type\": \"{{ $json.type }}\",\n  \"transaction_date\": \"{{ $json.transaction_date }}\"\n}"
+            },
+            "id": "insert",
+            "name": "Insert to Database",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1040,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ $json }}"
+            },
+            "id": "response",
+            "name": "Response",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1240,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "OpenAI Whisper",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Whisper": {
+            "main": [
+                [
+                    {
+                        "node": "GPT Analysis",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "GPT Analysis": {
+            "main": [
+                [
+                    {
+                        "node": "Parse JSON",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse JSON": {
+            "main": [
+                [
+                    {
+                        "node": "Insert to Database",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Insert to Database": {
+            "main": [
+                [
+                    {
+                        "node": "Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
