@@ -443,7 +443,8 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 <div class="card-title"><i data-lucide="trending-up" width="16"></i> Resumo Financeiro</div>
                 <div class="summary-header">
                     <div class="summary-label">Patrimônio Líquido</div>
-                    <div class="summary-total">R$ <span id="net-worth">...</span></div>
+                    <div class="summary-total">R$ <span
+                            id="net-worth"><?php echo number_format($current_balance, 2, ',', '.'); ?></span></div>
                 </div>
                 <div class="summary-list">
                     <div class="summary-item">
@@ -954,8 +955,8 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 document.getElementById('day-bar').style.width = (diffPct * 100) + '%';
                 document.getElementById('day-pct').innerText = (diffPct * 100).toFixed(2) + '%';
 
-                // 4. Net Worth
-                const netWorth = CONFIG.currentBalance + CONFIG.earnedStatic + earnedToday;
+                // 4. Net Worth (Patrimônio Líquido = Saldo em Conta)
+                const netWorth = CONFIG.currentBalance;
                 document.getElementById('net-worth').innerText = formatMoney(netWorth);
             }
             setInterval(update, 100);
