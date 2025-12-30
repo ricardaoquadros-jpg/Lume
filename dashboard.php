@@ -780,10 +780,10 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         </div>
 
         <!-- AI Assistant Button (Floating) -->
-        <a href="chat.php" id="ai-assistant-btn"
-            style="position:fixed; bottom:24px; left:24px; width:56px; height:56px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 16px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; z-index:1000; text-decoration: none;">
+        <button id="ai-assistant-btn" onclick="toggleChat()"
+            style="position:fixed; bottom:24px; left:24px; width:56px; height:56px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 16px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; z-index:1000;">
             <i data-lucide="bot" width="28" style="color:white;"></i>
-        </a>
+        </button>
         <!-- Modal removed in favor of chat.php -->
 
         <!-- AI Chat Modal (Draggable Sidebar Style) -->
@@ -800,7 +800,11 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     <span style="color:white; font-weight:600; font-size:14px; letter-spacing:0.5px;">Lume AI
                         Consultant</span>
                 </div>
-                <div style="display:flex; gap:12px;">
+                <div style="display:flex; gap:10px;">
+                    <button onclick="resetChat()" title="Novo Chat"
+                        style="background:none; border:none; cursor:pointer; opacity:0.8; color:white;">
+                        <i data-lucide="rotate-ccw" width="16"></i>
+                    </button>
                     <button onclick="toggleExpand()" title="Expandir"
                         style="background:none; border:none; cursor:pointer; opacity:0.8; color:white;">
                         <i data-lucide="maximize-2" width="16"></i>
@@ -820,8 +824,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     <div class="message-content">
                         Olá! Sou o <strong>Lume</strong>.
                         <br><br>
-                        Estou conectado aos seus dados. Posso analisar seus gastos ou sugerir investimentos. Como posso
-                        ajudar?
+                        Se é nossa primeira vez, preciso entender seu perfil. Caso contrário, como posso ajudar hoje?
                     </div>
                 </div>
             </div>
@@ -843,7 +846,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             <div style="padding:16px; background:white; border-top:1px solid #F3F4F6;">
                 <div
                     style="display:flex; align-items:flex-end; gap:8px; background:#F3F4F6; border-radius:12px; padding:8px 12px; border:1px solid transparent; transition:border 0.2s;">
-                    <textarea id="chat-input" rows="1" placeholder="Pergunte algo..."
+                    <textarea id="chat-input" rows="1" placeholder="Converse comigo..."
                         style="flex:1; background:transparent; border:none; resize:none; font-size:14px; max-height:100px; outline:none; line-height:1.5;"
                         oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
                         onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendChatMessage();}"></textarea>
