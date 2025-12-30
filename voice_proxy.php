@@ -3,8 +3,8 @@ session_start();
 require_once 'conexao.php';
 
 // Disable error display to prevent HTML in JSON response
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 header('Content-Type: application/json');
 
@@ -26,8 +26,8 @@ if (!isset($_FILES['audio'])) {
 $audioFile = $_FILES['audio']['tmp_name'];
 $audioName = $_FILES['audio']['name'];
 
-// Forward to n8n webhook (OpenAI version)
-$n8nUrl = 'https://ricardoquadross.app.n8n.cloud/webhook-test/lume-voice-openai';
+// Forward to n8n webhook (Production mode - auto-active)
+$n8nUrl = 'https://ricardoquadross.app.n8n.cloud/webhook/lume-voice-openai';
 
 $curl = curl_init();
 
@@ -94,8 +94,8 @@ $insertedTransactions = [];
 
 try {
     $stmt = $pdo->prepare("
-        INSERT INTO transactions (user_id, type, description, amount, category, transaction_date)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO transactions (user_id, type, description, amount, category, transaction_date, transcription)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ");
     
     foreach ($transactions as $t) {
@@ -105,7 +105,8 @@ try {
             $t['description'],
             $t['amount'],
             $t['category'] ?? 'Outros',
-            $t['transaction_date']
+            $t['transaction_date'],
+            $t['transcription'] ?? null
         ]);
         
         $insertedTransactions[] = [
@@ -114,7 +115,8 @@ try {
             'description' => $t['description'],
             'amount' => $t['amount'],
             'category' => $t['category'] ?? 'Outros',
-            'transaction_date' => $t['transaction_date']
+            'transaction_date' => $t['transaction_date'],
+            'transcription' => $t['transcription'] ?? null
         ];
     }
     
@@ -133,5 +135,8 @@ try {
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Erro ao salvar no banco de dados: ' . $e->getMessage()]);
+    echo json_encode([
+        'status' => 'error', 
+        'message' => 'Erro ao salvar no banco de dados: ' . mb_convert_encoding($e->getMessage(), 'UTF-8', 'UTF-8')
+    ], JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_UNESCAPED_UNICODE);
 }
