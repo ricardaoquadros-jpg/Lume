@@ -15,19 +15,15 @@ $user_id = $_SESSION['user_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lume AI - Consultor Financeiro</title>
+    <title>Lume AI - Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --sidebar-bg: #0b3680;
-            /* Navy Blue */
-            --sidebar-hover: #0d429a;
+            --sidebar-bg: #F9F9FB;
             --main-bg: #FFFFFF;
+            --accent: #0b3680;
             --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --user-msg-bg: #F5F5F7;
-            --ai-msg-bg: #FFFFFF;
             --border: #E5E5EA;
             --input-bg: #F5F5F7;
         }

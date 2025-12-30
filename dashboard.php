@@ -780,10 +780,11 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         </div>
 
         <!-- AI Assistant Button (Floating) -->
-        <button id="ai-assistant-btn" onclick="toggleChat()"
-            style="position:fixed; bottom:24px; left:24px; width:56px; height:56px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 16px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; z-index:1000;">
+        <a href="chat.php" id="ai-assistant-btn"
+            style="position:fixed; bottom:24px; left:24px; width:56px; height:56px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 16px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; z-index:1000; text-decoration: none;">
             <i data-lucide="bot" width="28" style="color:white;"></i>
-        </button>
+        </a>
+        <!-- Modal removed in favor of chat.php -->
 
         <!-- AI Chat Modal (Draggable Sidebar Style) -->
         <div id="ai-chat-modal"
