@@ -779,78 +779,192 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             🎙️ Gravando...
         </div>
 
-        <!-- AI Assistant Button (Minimal - Navy Blue) -->
+        <!-- AI Assistant Button (Floating) -->
         <button id="ai-assistant-btn" onclick="toggleChat()"
-            style="position:fixed; bottom:100px; left:24px; width:48px; height:48px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 12px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; z-index:100;">
-            <i data-lucide="bot" width="20" style="color:white;"></i>
+            style="position:fixed; bottom:24px; left:24px; width:56px; height:56px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 16px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; z-index:1000;">
+            <i data-lucide="bot" width="28" style="color:white;"></i>
         </button>
 
-        <!-- AI Chat (Navy Blue Pop-up) -->
+        <!-- AI Chat Modal (Draggable Sidebar Style) -->
         <div id="ai-chat-modal"
-            style="display:none; position:fixed; bottom:160px; left:24px; width:320px; max-width:calc(100vw - 48px); height:400px; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:99; flex-direction:column; overflow:hidden; transform-origin: bottom left; animation: popUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);">
-            <!-- Chat Header -->
-            <div
-                style="background:var(--accent); padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <i data-lucide="bot" width="18" style="color:white;"></i>
-                    <span style="color:white; font-weight:600; font-size:13px;">Lume AI</span>
+            style="display:none; position:fixed; bottom:100px; left:24px; width:380px; height:600px; max-height:80vh; background:white; border-radius:12px; box-shadow:0 8px 40px rgba(0,0,0,0.25); z-index:1001; display:flex; flex-direction:column; overflow:hidden; border:1px solid rgba(0,0,0,0.1);">
+
+            <!-- Draggable Header -->
+            <div id="ai-chat-header"
+                style="background:var(--accent); padding:14px 16px; display:flex; justify-content:space-between; align-items:center; cursor:grab; user-select:none;">
+                <div style="display:flex; align-items:center; gap:10px; pointer-events:none;">
+                    <div
+                        style="width:8px; height:8px; background:#00ff88; border-radius:50%; box-shadow:0 0 8px #00ff88;">
+                    </div>
+                    <span style="color:white; font-weight:600; font-size:14px; letter-spacing:0.5px;">Lume AI
+                        Consultant</span>
                 </div>
-                <button onclick="toggleChat()"
-                    style="background:transparent; border:none; cursor:pointer; padding:2px;">
-                    <i data-lucide="x" width="16" style="color:white;"></i>
-                </button>
+                <div style="display:flex; gap:12px;">
+                    <button onclick="toggleExpand()" title="Expandir"
+                        style="background:none; border:none; cursor:pointer; opacity:0.8; color:white;">
+                        <i data-lucide="maximize-2" width="16"></i>
+                    </button>
+                    <button onclick="toggleChat()" title="Fechar"
+                        style="background:none; border:none; cursor:pointer; opacity:0.8; color:white;">
+                        <i data-lucide="x" width="18"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Chat Messages -->
+            <!-- Chat Content (ChatGPT Style) -->
             <div id="chat-messages"
-                style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; font-size:12px;">
-                <div class="ai-message"
-                    style="background:#F2F2F7; padding:10px 12px; border-radius:10px 10px 10px 0; max-width:90%; line-height:1.4;">
-                    👋 Olá! Sou seu consultor financeiro. Como posso ajudar com seu patrimônio hoje?
+                style="flex:1; overflow-y:auto; padding:0; display:flex; flex-direction:column; background:#FFFFFF;">
+                <div class="message-block ai-block">
+                    <div class="avatar ai-avatar"><i data-lucide="bot" width="16"></i></div>
+                    <div class="message-content">
+                        Olá! Sou o <strong>Lume</strong>.
+                        <br><br>
+                        Estou conectado aos seus dados. Posso analisar seus gastos ou sugerir investimentos. Como posso
+                        ajudar?
+                    </div>
                 </div>
             </div>
 
-            <!-- Pending Action -->
+            <!-- Review Action Card -->
             <div id="pending-action"
-                style="display:none; background:#FFF9E6; border-top:1px solid #F0E6CC; padding:10px 12px; font-size:11px;">
-                <div id="pending-action-text" style="color:#666; margin-bottom:8px;"></div>
-                <div style="display:flex; gap:6px;">
+                style="display:none; background:#F9FAFB; padding:12px 16px; border-top:1px solid #E5E7EB;">
+                <div id="pending-action-text"
+                    style="font-size:13px; color:#374151; margin-bottom:10px; font-weight:500;"></div>
+                <div style="display:flex; gap:8px;">
                     <button onclick="confirmAction()"
-                        style="flex:1; padding:8px; background:var(--accent); color:white; border:none; border-radius:6px; font-weight:600; font-size:11px; cursor:pointer;">
-                        ✓ Confirmar
-                    </button>
+                        style="flex:1; padding:8px; background:#10B981; color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">Confirmar</button>
                     <button onclick="cancelAction()"
-                        style="flex:1; padding:8px; background:#F2F2F7; color:var(--text); border:none; border-radius:6px; font-weight:600; font-size:11px; cursor:pointer;">
-                        ✗ Cancelar
-                    </button>
+                        style="flex:1; padding:8px; background:#E5E7EB; color:#374151; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">Cancelar</button>
                 </div>
             </div>
 
-            <!-- Chat Input -->
-            <div style="padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:6px;">
-                <input type="text" id="chat-input" placeholder="Digite..."
-                    style="flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:16px; font-size:12px; outline:none;"
-                    onkeypress="if(event.key==='Enter')sendChatMessage()">
-                <button onclick="sendChatMessage()"
-                    style="width:34px; height:34px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                    <i data-lucide="send" width="14" style="color:white;"></i>
-                </button>
+            <!-- Input Area -->
+            <div style="padding:16px; background:white; border-top:1px solid #F3F4F6;">
+                <div
+                    style="display:flex; align-items:flex-end; gap:8px; background:#F3F4F6; border-radius:12px; padding:8px 12px; border:1px solid transparent; transition:border 0.2s;">
+                    <textarea id="chat-input" rows="1" placeholder="Pergunte algo..."
+                        style="flex:1; background:transparent; border:none; resize:none; font-size:14px; max-height:100px; outline:none; line-height:1.5;"
+                        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+                        onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendChatMessage();}"></textarea>
+                    <button onclick="sendChatMessage()"
+                        style="background:var(--accent); border:none; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
+                        <i data-lucide="arrow-up" width="16" style="color:white;"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
         <style>
-            @keyframes popUp {
-                from {
-                    opacity: 0;
-                    transform: scale(0.8) translateY(20px);
-                }
+            /* ChatGPT-like Internal Styling */
+            .message-block {
+                display: flex;
+                gap: 12px;
+                padding: 20px 16px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+                font-size: 14px;
+                line-height: 1.6;
+                color: #1f2937;
+            }
 
-                to {
-                    opacity: 1;
-                    transform: scale(1) translateY(0);
-                }
+            .ai-block {
+                background: #FFFFFF;
+            }
+
+            .user-block {
+                background: #F9FAFB;
+            }
+
+            .avatar {
+                width: 28px;
+                height: 28px;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            .ai-avatar {
+                background: var(--accent);
+                color: white;
+            }
+
+            .user-avatar {
+                background: #4B5563;
+                color: white;
+            }
+
+            .message-content {
+                flex: 1;
+                word-break: break-word;
+            }
+
+            .message-content strong {
+                font-weight: 600;
+                color: #111;
+            }
+
+            /* Draggable/Resizable Classes */
+            .modal-expanded {
+                width: 600px !important;
+                height: 80vh !important;
             }
         </style>
+
+        <script>
+            // Draggable Logic
+            const modal = document.getElementById('ai-chat-modal');
+            const header = document.getElementById('ai-chat-header');
+
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            header.onmousedown = function (e) {
+                e.preventDefault();
+                isDragging = true;
+                header.style.cursor = 'grabbing';
+
+                // Get mouse start position
+                startX = e.clientX;
+                startY = e.clientY;
+
+                // Get element start position
+                const rect = modal.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+
+                // Remove bottom/right constraints if set (switch to top/left positioning)
+                modal.style.bottom = 'auto';
+                modal.style.right = 'auto';
+                modal.style.left = initialLeft + 'px';
+                modal.style.top = initialTop + 'px';
+            };
+
+            document.onmouseup = function () {
+                isDragging = false;
+                header.style.cursor = 'grab';
+            };
+
+            document.onmousemove = function (e) {
+                if (!isDragging) return;
+
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+
+                modal.style.left = (initialLeft + dx) + 'px';
+                modal.style.top = (initialTop + dy) + 'px';
+            };
+
+            // Toggle Expand
+            function toggleExpand() {
+                modal.classList.toggle('modal-expanded');
+                // Re-center if expanded? Or just let it grow.
+            }
+
+            // Previous JS Logic (Chat)...
+            // (Ensure sendChatMessage and other functions are still valid below)
+        </script>
 
         <script>
             lucide.createIcons();
