@@ -94,8 +94,8 @@ $insertedTransactions = [];
 
 try {
     $stmt = $pdo->prepare("
-        INSERT INTO transactions (user_id, type, description, amount, category, transaction_date, transcription)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO transactions (user_id, type, description, amount, category, transaction_date)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
     
     foreach ($transactions as $t) {
@@ -105,8 +105,7 @@ try {
             $t['description'],
             $t['amount'],
             $t['category'] ?? 'Outros',
-            $t['transaction_date'],
-            $t['transcription'] ?? null
+            $t['transaction_date']
         ]);
         
         $insertedTransactions[] = [
@@ -115,8 +114,7 @@ try {
             'description' => $t['description'],
             'amount' => $t['amount'],
             'category' => $t['category'] ?? 'Outros',
-            'transaction_date' => $t['transaction_date'],
-            'transcription' => $t['transcription'] ?? null
+            'transaction_date' => $t['transaction_date']
         ];
     }
     

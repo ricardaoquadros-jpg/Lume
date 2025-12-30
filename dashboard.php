@@ -479,11 +479,14 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 class="recents-title" style="margin:0;">Despesas por Categoria</h3>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <button onclick="changeMonth(-1)" style="background:var(--card); border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer;">
+                    <button onclick="changeMonth(-1)"
+                        style="background:var(--card); border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer;">
                         <i data-lucide="chevron-left" width="16"></i>
                     </button>
-                    <span id="current-month-label" style="font-weight:600; min-width:120px; text-align:center;">Dezembro 2024</span>
-                    <button onclick="changeMonth(1)" style="background:var(--card); border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer;">
+                    <span id="current-month-label" style="font-weight:600; min-width:120px; text-align:center;">Dezembro
+                        2024</span>
+                    <button onclick="changeMonth(1)"
+                        style="background:var(--card); border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer;">
                         <i data-lucide="chevron-right" width="16"></i>
                     </button>
                 </div>
@@ -491,10 +494,12 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <!-- Monthly Chart -->
-                <div style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                <div
+                    style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                         <div style="font-weight:600; font-size:14px; color:var(--text);">Despesas do Mês</div>
-                        <div id="monthly-total" style="font-weight:700; font-size:18px; color:var(--danger);">R$ 0,00</div>
+                        <div id="monthly-total" style="font-weight:700; font-size:18px; color:var(--danger);">R$ 0,00
+                        </div>
                     </div>
                     <div style="height:250px; display:flex; justify-content:center; align-items:center;">
                         <canvas id="monthlyChart"></canvas>
@@ -502,10 +507,12 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 </div>
 
                 <!-- All Time Chart -->
-                <div style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                <div
+                    style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                         <div style="font-weight:600; font-size:14px; color:var(--text);">Despesas Totais</div>
-                        <div id="alltime-total" style="font-weight:700; font-size:18px; color:var(--danger);">R$ 0,00</div>
+                        <div id="alltime-total" style="font-weight:700; font-size:18px; color:var(--danger);">R$ 0,00
+                        </div>
                     </div>
                     <div style="height:250px; display:flex; justify-content:center; align-items:center;">
                         <canvas id="alltimeChart"></canvas>
@@ -575,9 +582,12 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                 $transcription = htmlspecialchars($t['transcription'] ?? '');
                                 $hasTranscription = !empty($t['transcription']);
                                 ?>
-                                <tr class="transaction-row" data-id="<?php echo $t['id']; ?>" style="border-bottom:1px solid var(--border); cursor:pointer;" onclick="toggleTransactionDetail(<?php echo $t['id']; ?>)">
+                                <tr class="transaction-row" data-id="<?php echo $t['id']; ?>"
+                                    style="border-bottom:1px solid var(--border); cursor:pointer;"
+                                    onclick="toggleTransactionDetail(<?php echo $t['id']; ?>)">
                                     <td style="padding:12px 8px 12px 16px; color:var(--sub);">
-                                        <i data-lucide="<?php echo $hasTranscription ? 'chevron-down' : 'minus'; ?>" width="16" class="expand-icon-<?php echo $t['id']; ?>"></i>
+                                        <i data-lucide="<?php echo $hasTranscription ? 'chevron-down' : 'minus'; ?>" width="16"
+                                            class="expand-icon-<?php echo $t['id']; ?>"></i>
                                     </td>
                                     <td style="padding:12px 16px; font-weight:500; color:var(--text);">
                                         <?php echo htmlspecialchars($t['description']); ?>
@@ -592,28 +602,35 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                         <?php echo $sign . ' R$ ' . number_format($t['amount'], 2, ',', '.'); ?>
                                     </td>
                                     <td style="padding:12px 16px; text-align:right;" onclick="event.stopPropagation();">
-                                        <button onclick="openEditModal(<?php echo htmlspecialchars(json_encode($t)); ?>)" 
-                                            style="background:transparent; border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer; margin-right:4px;" title="Editar">
+                                        <button onclick="openEditModal(<?php echo htmlspecialchars(json_encode($t)); ?>)"
+                                            style="background:transparent; border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer; margin-right:4px;"
+                                            title="Editar">
                                             <i data-lucide="edit-2" width="14"></i>
                                         </button>
-                                        <button onclick="deleteTransaction(<?php echo $t['id']; ?>)" 
-                                            style="background:transparent; border:1px solid var(--danger); color:var(--danger); padding:6px 10px; border-radius:6px; cursor:pointer;" title="Remover">
+                                        <button onclick="deleteTransaction(<?php echo $t['id']; ?>)"
+                                            style="background:transparent; border:1px solid var(--danger); color:var(--danger); padding:6px 10px; border-radius:6px; cursor:pointer;"
+                                            title="Remover">
                                             <i data-lucide="trash-2" width="14"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <?php if ($hasTranscription): ?>
-                                <tr class="transaction-detail" id="detail-<?php echo $t['id']; ?>" style="display:none; background:#FAFAFA;">
-                                    <td colspan="6" style="padding:16px 16px 16px 48px;">
-                                        <div style="display:flex; align-items:flex-start; gap:12px;">
-                                            <i data-lucide="mic" width="18" style="color:var(--accent); flex-shrink:0; margin-top:2px;"></i>
-                                            <div>
-                                                <div style="font-size:11px; color:var(--sub); font-weight:600; margin-bottom:4px;">TRANSCRIÇÃO DO ÁUDIO</div>
-                                                <div style="font-size:13px; color:var(--text); font-style:italic;">"<?php echo $transcription; ?>"</div>
+                                    <tr class="transaction-detail" id="detail-<?php echo $t['id']; ?>"
+                                        style="display:none; background:#FAFAFA;">
+                                        <td colspan="6" style="padding:16px 16px 16px 48px;">
+                                            <div style="display:flex; align-items:flex-start; gap:12px;">
+                                                <i data-lucide="mic" width="18"
+                                                    style="color:var(--accent); flex-shrink:0; margin-top:2px;"></i>
+                                                <div>
+                                                    <div
+                                                        style="font-size:11px; color:var(--sub); font-weight:600; margin-bottom:4px;">
+                                                        TRANSCRIÇÃO DO ÁUDIO</div>
+                                                    <div style="font-size:13px; color:var(--text); font-style:italic;">
+                                                        "<?php echo $transcription; ?>"</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
                                 <?php endif; ?>
                             <?php endforeach; endif; ?>
                     </tbody>
@@ -761,60 +778,61 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             🎙️ Gravando...
         </div>
 
-        <!-- AI Assistant Button -->
+        <!-- AI Assistant Button (Minimal) -->
         <button id="ai-assistant-btn" onclick="toggleChat()"
-            style="position:fixed; bottom:24px; left:24px; width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); border:none; box-shadow:0 4px 12px rgba(102,126,234,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s;">
-            <i data-lucide="bot" width="28" style="color:white;"></i>
+            style="position:fixed; bottom:100px; left:24px; width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); border:none; box-shadow:0 4px 12px rgba(102,126,234,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; z-index:100;">
+            <i data-lucide="bot" width="20" style="color:white;"></i>
         </button>
 
-        <!-- AI Chat Modal -->
-        <div id="ai-chat-modal" style="display:none; position:fixed; bottom:100px; left:24px; width:380px; max-width:calc(100vw - 48px); height:500px; max-height:calc(100vh - 150px); background:white; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); z-index:300; display:flex; flex-direction:column; overflow:hidden;">
-            <!-- Chat Header -->
-            <div style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <i data-lucide="bot" width="24" style="color:white;"></i>
-                    <div>
-                        <div style="color:white; font-weight:600; font-size:14px;">Lume AI</div>
-                        <div style="color:rgba(255,255,255,0.7); font-size:11px;">Seu assistente financeiro</div>
-                    </div>
+        <!-- AI Chat (Compact) -->
+        <div id="ai-chat-modal"
+            style="display:none; position:fixed; bottom:160px; left:24px; width:320px; max-width:calc(100vw - 48px); height:400px; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:99; display:flex; flex-direction:column; overflow:hidden;">
+            <!-- Chat Header (Compact) -->
+            <div
+                style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="bot" width="18" style="color:white;"></i>
+                    <span style="color:white; font-weight:600; font-size:13px;">Lume AI</span>
                 </div>
-                <button onclick="toggleChat()" style="background:transparent; border:none; cursor:pointer; padding:4px;">
-                    <i data-lucide="x" width="20" style="color:white;"></i>
+                <button onclick="toggleChat()"
+                    style="background:transparent; border:none; cursor:pointer; padding:2px;">
+                    <i data-lucide="x" width="16" style="color:white;"></i>
                 </button>
             </div>
-            
-            <!-- Chat Messages -->
-            <div id="chat-messages" style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;">
-                <div class="ai-message" style="background:#F2F2F7; padding:12px 16px; border-radius:12px 12px 12px 0; max-width:85%; font-size:13px; line-height:1.5;">
-                    👋 Olá! Sou o Lume, seu assistente financeiro. Posso te ajudar a:
-                    <br><br>
-                    • Adicionar despesas ou receitas<br>
-                    • Remover transações erradas<br>
-                    • Editar valores ou categorias<br><br>
-                    Como posso ajudar?
+
+            <!-- Chat Messages (Smaller) -->
+            <div id="chat-messages"
+                style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; font-size:12px;">
+                <div class="ai-message"
+                    style="background:#F2F2F7; padding:10px 12px; border-radius:10px 10px 10px 0; max-width:90%; line-height:1.4;">
+                    👋 Olá! Como posso ajudar com suas finanças?
                 </div>
             </div>
-            
-            <!-- Pending Action Preview -->
-            <div id="pending-action" style="display:none; background:#FFF9E6; border-top:1px solid #F0E6CC; padding:12px 16px;">
-                <div id="pending-action-text" style="font-size:12px; color:#666; margin-bottom:10px;"></div>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="confirmAction()" style="flex:1; padding:10px; background:var(--accent); color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer;">
-                        ✓ Confirmar
+
+            <!-- Pending Action (Compact) -->
+            <div id="pending-action"
+                style="display:none; background:#FFF9E6; border-top:1px solid #F0E6CC; padding:10px 12px; font-size:11px;">
+                <div id="pending-action-text" style="color:#666; margin-bottom:8px;"></div>
+                <div style="display:flex; gap:6px;">
+                    <button onclick="confirmAction()"
+                        style="flex:1; padding:8px; background:var(--accent); color:white; border:none; border-radius:6px; font-weight:600; font-size:11px; cursor:pointer;">
+                        ✓ OK
                     </button>
-                    <button onclick="cancelAction()" style="flex:1; padding:10px; background:#F2F2F7; color:var(--text); border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer;">
-                        ✗ Cancelar
+                    <button onclick="cancelAction()"
+                        style="flex:1; padding:8px; background:#F2F2F7; color:var(--text); border:none; border-radius:6px; font-weight:600; font-size:11px; cursor:pointer;">
+                        ✗ Não
                     </button>
                 </div>
             </div>
-            
-            <!-- Chat Input -->
-            <div style="padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px;">
-                <input type="text" id="chat-input" placeholder="Digite sua mensagem..." 
-                    style="flex:1; padding:10px 14px; border:1px solid var(--border); border-radius:20px; font-size:13px; outline:none;"
+
+            <!-- Chat Input (Compact) -->
+            <div style="padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:6px;">
+                <input type="text" id="chat-input" placeholder="Digite..."
+                    style="flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:16px; font-size:12px; outline:none;"
                     onkeypress="if(event.key==='Enter')sendChatMessage()">
-                <button onclick="sendChatMessage()" style="width:40px; height:40px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                    <i data-lucide="send" width="18" style="color:white;"></i>
+                <button onclick="sendChatMessage()"
+                    style="width:34px; height:34px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <i data-lucide="send" width="14" style="color:white;"></i>
                 </button>
             </div>
         </div>
@@ -1014,7 +1032,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     if (result.status === 'success') {
                         const count = result.count || 1;
                         const transactions = result.transactions || [];
-                        
+
                         if (count === 1 && transactions.length > 0) {
                             const t = transactions[0];
                             const typeText = t.type === 'income' ? 'Entrada' : 'Despesa';
@@ -1023,7 +1041,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             let summary = '✅ ' + count + ' transações registradas:\n\n';
                             transactions.forEach((t, i) => {
                                 const typeText = t.type === 'income' ? '+' : '-';
-                                summary += (i+1) + '. ' + t.description + ' ' + typeText + ' R$ ' + parseFloat(t.amount).toFixed(2) + '\n';
+                                summary += (i + 1) + '. ' + t.description + ' ' + typeText + ' R$ ' + parseFloat(t.amount).toFixed(2) + '\n';
                             });
                             alert(summary);
                         } else {
@@ -1054,19 +1072,19 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 document.getElementById('edit-amount').value = parseFloat(transaction.amount);
                 document.getElementById('edit-category').value = transaction.category || 'Outros';
                 document.getElementById('edit-date').value = transaction.transaction_date;
-                
+
                 if (transaction.type === 'income') {
                     document.getElementById('edit-type-income').checked = true;
                 } else {
                     document.getElementById('edit-type-expense').checked = true;
                 }
-                
+
                 document.getElementById('edit-modal').style.display = 'flex';
             }
 
             async function saveEdit(event) {
                 event.preventDefault();
-                
+
                 const id = document.getElementById('edit-id').value;
                 const type = document.querySelector('input[name="edit-type"]:checked').value;
                 const description = document.getElementById('edit-description').value;
@@ -1082,7 +1100,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     });
 
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         alert('✅ Transação atualizada com sucesso!');
                         location.reload();
@@ -1105,7 +1123,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     });
 
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         alert('✅ Transação removida com sucesso!');
                         location.reload();
@@ -1134,7 +1152,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             function addMessage(content, isUser) {
                 const messagesDiv = document.getElementById('chat-messages');
                 const msgDiv = document.createElement('div');
-                msgDiv.style.cssText = isUser 
+                msgDiv.style.cssText = isUser
                     ? 'background:var(--accent); color:white; padding:12px 16px; border-radius:12px 12px 0 12px; max-width:85%; font-size:13px; align-self:flex-end;'
                     : 'background:#F2F2F7; padding:12px 16px; border-radius:12px 12px 12px 0; max-width:85%; font-size:13px; line-height:1.5;';
                 msgDiv.innerHTML = content;
@@ -1146,9 +1164,9 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 pendingAction = response;
                 const pendingDiv = document.getElementById('pending-action');
                 const textDiv = document.getElementById('pending-action-text');
-                
+
                 let previewText = '';
-                
+
                 if (response.action === 'remove' && response.transactions_to_remove) {
                     previewText = '<strong>Transações a remover:</strong><br>';
                     response.transactions_to_remove.forEach(t => {
@@ -1165,7 +1183,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         previewText += `• ${key}: ${val}<br>`;
                     }
                 }
-                
+
                 textDiv.innerHTML = previewText;
                 pendingDiv.style.display = 'block';
             }
@@ -1179,34 +1197,34 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 const input = document.getElementById('chat-input');
                 const message = input.value.trim();
                 if (!message) return;
-                
+
                 input.value = '';
                 addMessage(message, true);
-                
+
                 // Show typing indicator
                 addMessage('⏳ Pensando...', false);
-                
+
                 try {
                     const response = await fetch('/ai_assistant.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ action: 'chat', message: message })
                     });
-                    
+
                     const result = await response.json();
-                    
+
                     // Remove typing indicator
                     const msgs = document.getElementById('chat-messages');
                     msgs.removeChild(msgs.lastChild);
-                    
+
                     // Add AI response
                     addMessage(result.message || 'Desculpe, não entendi.', false);
-                    
+
                     // Show confirmation if needed
                     if (result.requires_confirmation && result.action !== 'reply' && result.action !== 'clarify') {
                         showPendingAction(result);
                     }
-                    
+
                 } catch (error) {
                     const msgs = document.getElementById('chat-messages');
                     msgs.removeChild(msgs.lastChild);
@@ -1217,23 +1235,23 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
             async function confirmAction() {
                 if (!pendingAction) return;
-                
+
                 addMessage('✓ Confirmado!', true);
-                
+
                 try {
                     const response = await fetch('/ai_assistant.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ action: 'confirm', pending_action: pendingAction })
                     });
-                    
+
                     const result = await response.json();
                     addMessage(result.message || '✅ Ação executada!', false);
                     hidePendingAction();
-                    
+
                     // Reload after a short delay to show the message
                     setTimeout(() => location.reload(), 1500);
-                    
+
                 } catch (error) {
                     addMessage('❌ Erro ao executar ação.', false);
                     console.error(error);
@@ -1269,8 +1287,8 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 'Outros': '#C9CBCF'
             };
 
-            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-                               'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
             let currentMonth = new Date().getMonth() + 1;
             let currentYear = new Date().getFullYear();
@@ -1278,7 +1296,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             let alltimeChartInstance = null;
 
             function formatCurrency(value) {
-                return 'R$ ' + parseFloat(value).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                return 'R$ ' + parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
             function createPieChart(canvasId, data, existingChart) {
@@ -1322,7 +1340,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
+                                    label: function (context) {
                                         const value = context.parsed;
                                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                         const pct = ((value / total) * 100).toFixed(1);
@@ -1342,7 +1360,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
                     if (data.status === 'success') {
                         // Update month label
-                        document.getElementById('current-month-label').textContent = 
+                        document.getElementById('current-month-label').textContent =
                             monthNames[currentMonth - 1] + ' ' + currentYear;
 
                         // Update totals
@@ -1371,7 +1389,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             }
 
             // Load charts on page load
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 loadCategoryData();
             });
         </script>
