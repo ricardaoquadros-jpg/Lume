@@ -779,18 +779,18 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             🎙️ Gravando...
         </div>
 
-        <!-- AI Assistant Button (Minimal) -->
+        <!-- AI Assistant Button (Minimal - Navy Blue) -->
         <button id="ai-assistant-btn" onclick="toggleChat()"
-            style="position:fixed; bottom:100px; left:24px; width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); border:none; box-shadow:0 4px 12px rgba(102,126,234,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; z-index:100;">
+            style="position:fixed; bottom:100px; left:24px; width:48px; height:48px; border-radius:50%; background:var(--accent); border:none; box-shadow:0 4px 12px rgba(11,54,128,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; z-index:100;">
             <i data-lucide="bot" width="20" style="color:white;"></i>
         </button>
 
-        <!-- AI Chat (Compact) -->
+        <!-- AI Chat (Navy Blue Pop-up) -->
         <div id="ai-chat-modal"
-            style="display:none; position:fixed; bottom:160px; left:24px; width:320px; max-width:calc(100vw - 48px); height:400px; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:99; display:flex; flex-direction:column; overflow:hidden;">
-            <!-- Chat Header (Compact) -->
+            style="display:none; position:fixed; bottom:160px; left:24px; width:320px; max-width:calc(100vw - 48px); height:400px; background:white; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.2); z-index:99; flex-direction:column; overflow:hidden; transform-origin: bottom left; animation: popUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);">
+            <!-- Chat Header -->
             <div
-                style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+                style="background:var(--accent); padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <i data-lucide="bot" width="18" style="color:white;"></i>
                     <span style="color:white; font-weight:600; font-size:13px;">Lume AI</span>
@@ -801,32 +801,32 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 </button>
             </div>
 
-            <!-- Chat Messages (Smaller) -->
+            <!-- Chat Messages -->
             <div id="chat-messages"
                 style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; font-size:12px;">
                 <div class="ai-message"
                     style="background:#F2F2F7; padding:10px 12px; border-radius:10px 10px 10px 0; max-width:90%; line-height:1.4;">
-                    👋 Olá! Como posso ajudar com suas finanças?
+                    👋 Olá! Sou seu consultor financeiro. Como posso ajudar com seu patrimônio hoje?
                 </div>
             </div>
 
-            <!-- Pending Action (Compact) -->
+            <!-- Pending Action -->
             <div id="pending-action"
                 style="display:none; background:#FFF9E6; border-top:1px solid #F0E6CC; padding:10px 12px; font-size:11px;">
                 <div id="pending-action-text" style="color:#666; margin-bottom:8px;"></div>
                 <div style="display:flex; gap:6px;">
                     <button onclick="confirmAction()"
                         style="flex:1; padding:8px; background:var(--accent); color:white; border:none; border-radius:6px; font-weight:600; font-size:11px; cursor:pointer;">
-                        ✓ OK
+                        ✓ Confirmar
                     </button>
                     <button onclick="cancelAction()"
                         style="flex:1; padding:8px; background:#F2F2F7; color:var(--text); border:none; border-radius:6px; font-weight:600; font-size:11px; cursor:pointer;">
-                        ✗ Não
+                        ✗ Cancelar
                     </button>
                 </div>
             </div>
 
-            <!-- Chat Input (Compact) -->
+            <!-- Chat Input -->
             <div style="padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:6px;">
                 <input type="text" id="chat-input" placeholder="Digite..."
                     style="flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:16px; font-size:12px; outline:none;"
@@ -837,6 +837,20 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 </button>
             </div>
         </div>
+
+        <style>
+            @keyframes popUp {
+                from {
+                    opacity: 0;
+                    transform: scale(0.8) translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+        </style>
 
         <script>
             lucide.createIcons();

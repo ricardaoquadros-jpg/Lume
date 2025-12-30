@@ -28,101 +28,208 @@ $message = $input['message'] ?? '';
 // OpenRouter API Key from environment
 $api_key = env('OPENROUTER_API_KEY');
 
-// Get recent transactions for context
-function getRecentTransactions($pdo, $user_id, $limit = 10)
+// --- HELPER FUNCTIONS ---
+
+// 1. Get Financial Stats (Balance, Income, Expense, Real-Time Earnings)
+function getFinancialStats($pdo, $user_id)
+{
+    // A. Get Profile & Settings
+    $stmt = $pdo->prepare("SELECT * FROM work_profiles WHERE user_id = ?");
+    $stmt->execute([$user_id]);
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$profile) {
+        return ['error' => 'Perfil não encontrado'];
+    }
+
+    $salary = (float) $profile['salary'];
+    $initial_balance = (float) $profile['initial_balance'];
+
+    // Work Schedule Logic
+    $work_start = $profile['work_start'];
+    $work_end = $profile['work_end'];
+    $work_days = json_decode($profile['work_days'] ?? '[]', true);
+
+    // Rates Calculation (Simulating Dashboard Logic)
+    $days_worked_month = count($work_days) ?: 20;
+    $daily_salary = $salary / $days_worked_month;
+
+    // Calculate Work Hours Total
+    $start_mins = (int) strtotime($work_start) / 60; // Simplified
+    $end_mins = (int) strtotime($work_end) / 60;
+    // Fix timezone offset or specific date issues if strictly needed, 
+    // but simpler to use raw hours for rate calc:
+    $d1 = new DateTime($work_start);
+    $d2 = new DateTime($work_end);
+    if ($d2 < $d1)
+        $d2->modify('+1 day');
+    $interval = $d1->diff($d2);
+    $work_hours_total = $interval->h + ($interval->i / 60);
+    // Deduct interval if any? (Keeping simple for AI context: gross hours)
+    if ($work_hours_total <= 0)
+        $work_hours_total = 8;
+
+    $hourly_rate = $daily_salary / $work_hours_total;
+
+    // B. Calculate "Earned Static" (Past days of month)
+    $now = new DateTime('now', new DateTimeZone('America/Sao_Paulo'));
+    $current_day = (int) $now->format('j');
+    $days_passed = 0;
+    foreach ($work_days as $d) {
+        if ($d < $current_day)
+            $days_passed++;
+    }
+    $earned_month_static = $days_passed * $daily_salary;
+
+    // C. Calculate "Earned Today" (Real Time)
+    $earned_today = 0;
+    $is_work_day = in_array($current_day, $work_days);
+
+    if ($is_work_day) {
+        $start_dt = new DateTime($work_start);
+        $end_dt = new DateTime($work_end);
+        // Adjust for "today"
+        $start_dt->setDate((int) $now->format('Y'), (int) $now->format('m'), (int) $now->format('d'));
+        $end_dt->setDate((int) $now->format('Y'), (int) $now->format('m'), (int) $now->format('d'));
+        if ($end_dt < $start_dt)
+            $end_dt->modify('+1 day');
+
+        if ($now >= $end_dt) {
+            $earned_today = $daily_salary;
+        } elseif ($now > $start_dt) {
+            // Partial day
+            $diff = $start_dt->diff($now);
+            $mins_worked = ($diff->h * 60) + $diff->i + ($diff->s / 60);
+            $mins_total = ($work_hours_total * 60);
+            $pct = $mins_worked / $mins_total;
+            if ($pct > 1)
+                $pct = 1;
+            $earned_today = $daily_salary * $pct;
+        }
+    }
+
+    $total_month_realtime = $earned_month_static + $earned_today;
+
+    // D. Transaction Stats
+    $stmt = $pdo->prepare("SELECT type, SUM(amount) as total FROM transactions WHERE user_id = ? GROUP BY type");
+    $stmt->execute([$user_id]);
+    $totals = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    $total_income_db = $totals['income'] ?? 0;
+    $total_expenses_db = $totals['expense'] ?? 0;
+
+    // Net Worth = Balance + Manual Income - Expenses (Same as Dashboard Reference)
+    // User requested "Patrimônio Líquido = Saldo em Conta"
+    $current_balance = ($initial_balance + $total_income_db) - $total_expenses_db;
+
+    // Monthly DB Flows
+    $stmt = $pdo->prepare("
+        SELECT type, SUM(amount) as total 
+        FROM transactions 
+        WHERE user_id = ? 
+        AND MONTH(transaction_date) = MONTH(CURRENT_DATE()) 
+        AND YEAR(transaction_date) = YEAR(CURRENT_DATE())
+        GROUP BY type
+    ");
+    $stmt->execute([$user_id]);
+    $month_totals = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    return [
+        'balance' => $current_balance, // Saldo Real
+        'salary' => $salary,
+        'hourly_rate' => $hourly_rate,
+        'daily_salary' => $daily_salary,
+        'earned_today_realtime' => $earned_today,
+        'earned_month_realtime' => $total_month_realtime,
+        'month_expenses_db' => $month_totals['expense'] ?? 0,
+        'month_income_db' => $month_totals['income'] ?? 0 // Manual extra income
+    ];
+}
+
+// 2. Get recent transactions
+function getRecentTransactions($pdo, $user_id, $limit = 20)
 {
     $stmt = $pdo->prepare("
         SELECT id, type, description, amount, category, transaction_date
         FROM transactions 
         WHERE user_id = ? 
-        ORDER BY created_at DESC 
+        ORDER BY transaction_date DESC, created_at DESC 
         LIMIT ?
     ");
     $stmt->execute([$user_id, $limit]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Send message to MiMo (via OpenRouter)
-function askAI($api_key, $message, $transactions, $user_id)
+// 3. Send message to AI (Supercharged Context)
+function askAI($api_key, $message, $transactions, $stats, $user_id)
 {
-    // Format transactions for context
-    $transactionList = "";
-    foreach ($transactions as $i => $t) {
+    // Format values
+    $bal = number_format($stats['balance'], 2, ',', '.');
+    $sal = number_format($stats['salary'], 2, ',', '.');
+    $hr = number_format($stats['hourly_rate'], 2, ',', '.');
+    $dayRev = number_format($stats['earned_today_realtime'], 2, ',', '.');
+    $monthRev = number_format($stats['earned_month_realtime'], 2, ',', '.');
+    $monthExp = number_format($stats['month_expenses_db'], 2, ',', '.');
+
+    // Day Progress %
+    $dayPct = ($stats['earned_today_realtime'] / $stats['daily_salary']) * 100;
+    $dayPctStr = number_format($dayPct, 1, ',', '.');
+
+    // Transactions list
+    $tList = "";
+    foreach ($transactions as $t) {
         $type = $t['type'] === 'income' ? 'Receita' : 'Despesa';
-        $transactionList .= "ID:{$t['id']} | {$type} | {$t['description']} | R$ " . number_format($t['amount'], 2, ',', '.') . " | {$t['category']} | {$t['transaction_date']}\n";
+        $tList .= "[ID:{$t['id']}] {$t['transaction_date']} | {$type} | {$t['category']} | {$t['description']} | R$ " . number_format($t['amount'], 2, ',', '.') . "\n";
     }
 
     $systemPrompt = <<<EOT
-Você é o Lume, um assistente financeiro inteligente. Você ajuda o usuário a gerenciar suas finanças.
+Você é o LUME AI, um Consultor Financeiro de Elite e Agente Autônomo.
+Você tem "Visão Total" do painel do usuário. Você lê gráficos, barras de progresso e valores em tempo real.
 
-CONTEXTO - Últimas transações do usuário:
-$transactionList
+=== LEITURA DO PAINEL (TEMPO REAL) ===
+💰 Saldo Bancário Atual: R$ {$bal}
+💸 Despesas do Mês (DB): R$ {$monthExp}
+💵 Ganhos do Mês (Salário Proporcional): R$ {$monthRev}
+⏱️ Ganhos de Hoje (Em Tempo Real): R$ {$dayRev}
+📊 Progresso do Dia de Trabalho: {$dayPctStr}% concluído
+⏳ Valor da Sua Hora: R$ {$hr}
+📅 Salário Base Mensal: R$ {$sal}
 
-SUAS CAPACIDADES:
-1. ADICIONAR transações (despesas ou receitas)
-2. REMOVER transações existentes (use os IDs acima)
-3. EDITAR transações existentes
-4. RESPONDER perguntas sobre as finanças
+=== ÚLTIMAS TRANSAÇÕES (DB) ===
+{$tList}
 
-REGRAS DE RESPOSTA:
-- Sempre responda em JSON válido
-- Use o campo "action" para indicar o que fazer
-- Use "requires_confirmation" = true quando for fazer alterações
-- Seja amigável e use emojis
+=== MELHORES MODELOS AI GRATUITOS (RECOMENDAÇÃO) ===
+Caso o usuário pergunte sobre IAs, recomende:
+1. **Llama 3.3 70B** (Meta) - O melhor Open Source geral (Raciocínio + Chat).
+2. **DeepSeek R1** - Excelente para raciocínio lógico e matemática.
+3. **Mixtral 8x7B** - Muito rápido e eficiente.
+Todos disponíveis via OpenRouter Free Tier.
 
-FORMATOS DE RESPOSTA:
+=== SUA MISSÃO ===
+1. **Gerenciar Finanças**: Use tools (add/remove/edit) sem medo.
+2. **Analisar Gráficos e Progresso**: Se o usuário perguntar "Como foi meu dia?", cite o valor ganho hoje ({$dayRev}) e a porcentagem ({$dayPctStr}%).
+3. **Investimentos**: Use o Saldo Bancário ({$bal}) como base para cálculos. Regra: 20% caixa / 80% investimentos (Tesouro/CDB).
 
-1. Para ADICIONAR transação(ões):
-{
-  "action": "add",
-  "requires_confirmation": true,
-  "message": "Entendi! Vou adicionar:",
-  "transactions": [{"description": "...", "amount": 0.00, "category": "...", "type": "expense"}]
-}
+=== REGRAS ===
+- Seja direto, profissional e extremamente inteligente.
+- Se vir algo errado (ex: gasto alto vs ganho baixo), dê bronca.
+- Responda SEMPRE em JSON no formato das tools abaixo.
 
-2. Para REMOVER transação(ões):
-{
-  "action": "remove",
-  "requires_confirmation": true,
-  "message": "Vou remover estas transações:",
-  "transaction_ids": [1, 2, 3]
-}
-
-3. Para EDITAR transação:
-{
-  "action": "edit",
-  "requires_confirmation": true,
-  "message": "Vou alterar a transação:",
-  "transaction_id": 1,
-  "changes": {"amount": 50.00, "description": "novo nome"}
-}
-
-4. Para apenas RESPONDER (sem ação):
-{
-  "action": "reply",
-  "requires_confirmation": false,
-  "message": "Sua resposta aqui..."
-}
-
-5. Quando NÃO ENTENDER:
-{
-  "action": "clarify",
-  "requires_confirmation": false,
-  "message": "Não entendi bem. Você quer adicionar uma despesa, remover algo, ou apenas conversar?"
-}
-
-Responda APENAS com JSON válido, sem texto adicional.
+=== JSON OUTPUT ===
+1. ADICIONAR: { "action": "add", "requires_confirmation": true, "message": "Adicionando...", "transactions": [...] }
+2. REMOVER: { "action": "remove", "requires_confirmation": true, "message": "Removendo...", "transaction_ids": [...] }
+3. EDITAR: { "action": "edit", "requires_confirmation": true, "message": "Editando...", "transaction_id": 123, "changes": {...} }
+4. REPLY: { "action": "reply", "requires_confirmation": false, "message": "Texto da resposta..." }
 EOT;
 
     $curl = curl_init();
-
     $payload = json_encode([
         'model' => 'meta-llama/llama-3.3-70b-instruct:free',
         'messages' => [
             ['role' => 'system', 'content' => $systemPrompt],
             ['role' => 'user', 'content' => $message]
         ],
-        'temperature' => 0.3
+        'temperature' => 0.4
     ]);
 
     curl_setopt_array($curl, [
@@ -134,7 +241,7 @@ EOT;
             'Authorization: Bearer ' . $api_key,
             'Content-Type: application/json',
             'HTTP-Referer: http://localhost:8000',
-            'X-Title: Lume Finance'
+            'X-Title: Lume Finance Expert'
         ],
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_TIMEOUT => 60
@@ -145,109 +252,90 @@ EOT;
     curl_close($curl);
 
     if ($error) {
-        return ['action' => 'error', 'message' => 'Erro ao conectar com AI: ' . $error];
+        return ['action' => 'error', 'message' => 'Erro AI: ' . $error];
     }
 
     $data = json_decode($response, true);
-
-    // Debug: log the response
-    error_log("MiMo Response: " . substr($response, 0, 500));
-
     $content = $data['choices'][0]['message']['content'] ?? '';
-
-    // Parse JSON from response
+    // Clean markdown
     $content = preg_replace('/```json\n?|```/', '', $content);
     $result = json_decode(trim($content), true);
 
-    if (!$result) {
-        // If JSON parsing fails, return as reply
-        return ['action' => 'reply', 'message' => $content ?: 'Desculpe, não consegui processar a resposta.'];
-    }
-
+    if (!$result)
+        return ['action' => 'reply', 'message' => $content ?: 'Erro de pensamento AI.'];
     return $result;
 }
 
-// Execute confirmed action
+// 4. Action Executor (Same as before, simplified for this context)
 function executeAction($pdo, $user_id, $actionData)
 {
+    // ... (Existing Logic for Add/Remove/Edit) ...
+    // Copying existing logic for stability
     $action = $actionData['action'] ?? '';
-
     switch ($action) {
         case 'add':
             $transactions = $actionData['transactions'] ?? [];
             $inserted = [];
-            $stmt = $pdo->prepare("
-                INSERT INTO transactions (user_id, type, description, amount, category, transaction_date)
-                VALUES (?, ?, ?, ?, ?, CURDATE())
-            ");
+            $stmt = $pdo->prepare("INSERT INTO transactions (user_id, type, description, amount, category, transaction_date, created_at) VALUES (?, ?, ?, ?, ?, CURDATE(), NOW())");
             foreach ($transactions as $t) {
-                $stmt->execute([
-                    $user_id,
-                    $t['type'] ?? 'expense',
-                    $t['description'],
-                    $t['amount'],
-                    $t['category'] ?? 'Outros'
-                ]);
+                $stmt->execute([$user_id, $t['type'] ?? 'expense', $t['description'], $t['amount'], $t['category'] ?? 'Outros']);
                 $inserted[] = $pdo->lastInsertId();
             }
-            return ['status' => 'success', 'message' => '✅ ' . count($inserted) . ' transação(ões) adicionada(s)!', 'ids' => $inserted];
+            return ['status' => 'success', 'message' => '✅ Transações adicionadas com sucesso!', 'ids' => $inserted];
 
         case 'remove':
             $ids = $actionData['transaction_ids'] ?? [];
-            if (empty($ids)) {
-                return ['status' => 'error', 'message' => 'Nenhum ID para remover'];
-            }
+            if (empty($ids))
+                return ['status' => 'error', 'message' => 'Nenhum ID'];
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $stmt = $pdo->prepare("DELETE FROM transactions WHERE id IN ($placeholders) AND user_id = ?");
             $params = array_merge($ids, [$user_id]);
             $stmt->execute($params);
-            return ['status' => 'success', 'message' => '✅ ' . count($ids) . ' transação(ões) removida(s)!'];
+            return ['status' => 'success', 'message' => '✅ Transações removidas!'];
 
         case 'edit':
             $id = $actionData['transaction_id'] ?? 0;
             $changes = $actionData['changes'] ?? [];
-            if (!$id || empty($changes)) {
-                return ['status' => 'error', 'message' => 'Dados inválidos para edição'];
-            }
-
+            if (!$id)
+                return ['status' => 'error', 'message' => 'ID inválido'];
             $sets = [];
             $params = [];
-            foreach ($changes as $field => $value) {
-                if (in_array($field, ['description', 'amount', 'category', 'type', 'transaction_date'])) {
-                    $sets[] = "$field = ?";
-                    $params[] = $value;
+            foreach ($changes as $k => $v) {
+                if (in_array($k, ['description', 'amount', 'category', 'type', 'transaction_date'])) {
+                    $sets[] = "$k = ?";
+                    $params[] = $v;
                 }
             }
-            if (empty($sets)) {
-                return ['status' => 'error', 'message' => 'Nenhum campo válido para editar'];
-            }
-
+            if (empty($sets))
+                return ['status' => 'error', 'message' => 'Nada para editar'];
             $params[] = $id;
             $params[] = $user_id;
-            $sql = "UPDATE transactions SET " . implode(', ', $sets) . " WHERE id = ? AND user_id = ?";
-            $stmt = $pdo->prepare($sql);
+            $stmt = $pdo->prepare("UPDATE transactions SET " . implode(', ', $sets) . " WHERE id = ? AND user_id = ?");
             $stmt->execute($params);
             return ['status' => 'success', 'message' => '✅ Transação atualizada!'];
 
         default:
-            return ['status' => 'error', 'message' => 'Ação não suportada'];
+            return ['status' => 'error', 'message' => 'Ação desconhecida'];
     }
 }
 
-// Handle different actions
+// === MAIN HANDLER ===
+
 switch ($action) {
     case 'chat':
-        // Get AI response
-        $transactions = getRecentTransactions($pdo, $user_id);
-        $response = askAI($api_key, $message, $transactions, $user_id);
+        // 1. Get Financial Context
+        $stats = getFinancialStats($pdo, $user_id);
+        $transactions = getRecentTransactions($pdo, $user_id, 20); // More context
 
-        // Enrich response with transaction details for preview
-        if ($response['action'] === 'remove' && isset($response['transaction_ids'])) {
+        // 2. Ask AI
+        $response = askAI($api_key, $message, $transactions, $stats, $user_id);
+
+        // 3. Hydrate 'remove' previews
+        if ($response['action'] === 'remove' && !empty($response['transaction_ids'])) {
             $ids = $response['transaction_ids'];
-            $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $stmt = $pdo->prepare("SELECT * FROM transactions WHERE id IN ($placeholders) AND user_id = ?");
-            $params = array_merge($ids, [$user_id]);
-            $stmt->execute($params);
+            $p = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $pdo->prepare("SELECT * FROM transactions WHERE id IN ($p) AND user_id = ?");
+            $stmt->execute(array_merge($ids, [$user_id]));
             $response['transactions_to_remove'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
@@ -255,20 +343,18 @@ switch ($action) {
         break;
 
     case 'confirm':
-        // Execute the confirmed action
-        $pendingAction = $input['pending_action'] ?? null;
-        if (!$pendingAction) {
-            echo json_encode(['status' => 'error', 'message' => 'Nenhuma ação pendente']);
-            exit;
+        // Execute pending action
+        $pending = $input['pending_action'] ?? null;
+        if ($pending) {
+            $result = executeAction($pdo, $user_id, $pending);
+            echo json_encode($result);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Nenhuma ação']);
         }
-
-        $result = executeAction($pdo, $user_id, $pendingAction);
-        echo json_encode($result);
         break;
 
     case 'get_context':
-        // Return recent transactions for display
-        $transactions = getRecentTransactions($pdo, $user_id, 5);
+        $transactions = getRecentTransactions($pdo, $user_id, 10);
         echo json_encode(['status' => 'success', 'transactions' => $transactions]);
         break;
 
