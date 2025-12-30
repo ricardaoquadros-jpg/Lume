@@ -42,6 +42,9 @@ function getFinancialStats($pdo, $user_id)
         return ['error' => 'Perfil não encontrado'];
     }
 
+    // Capture the AI Profile Text
+    $ai_profile_data = $profile['ai_profile_data'] ?? '';
+
     $salary = (float) $profile['salary'];
     $initial_balance = (float) $profile['initial_balance'];
 
@@ -50,28 +53,24 @@ function getFinancialStats($pdo, $user_id)
     $work_end = $profile['work_end'];
     $work_days = json_decode($profile['work_days'] ?? '[]', true);
 
-    // Rates Calculation (Simulating Dashboard Logic)
+    // Rates Calculation
     $days_worked_month = count($work_days) ?: 20;
     $daily_salary = $salary / $days_worked_month;
 
     // Calculate Work Hours Total
-    $start_mins = (int) strtotime($work_start) / 60; // Simplified
+    $start_mins = (int) strtotime($work_start) / 60;
     $end_mins = (int) strtotime($work_end) / 60;
-    // Fix timezone offset or specific date issues if strictly needed, 
-    // but simpler to use raw hours for rate calc:
     $d1 = new DateTime($work_start);
     $d2 = new DateTime($work_end);
     if ($d2 < $d1)
         $d2->modify('+1 day');
     $interval = $d1->diff($d2);
     $work_hours_total = $interval->h + ($interval->i / 60);
-    // Deduct interval if any? (Keeping simple for AI context: gross hours)
     if ($work_hours_total <= 0)
         $work_hours_total = 8;
-
     $hourly_rate = $daily_salary / $work_hours_total;
 
-    // B. Calculate "Earned Static" (Past days of month)
+    // Calculate "Earned Static"
     $now = new DateTime('now', new DateTimeZone('America/Sao_Paulo'));
     $current_day = (int) $now->format('j');
     $days_passed = 0;
@@ -81,14 +80,12 @@ function getFinancialStats($pdo, $user_id)
     }
     $earned_month_static = $days_passed * $daily_salary;
 
-    // C. Calculate "Earned Today" (Real Time)
+    // Calculate "Earned Today"
     $earned_today = 0;
     $is_work_day = in_array($current_day, $work_days);
-
     if ($is_work_day) {
         $start_dt = new DateTime($work_start);
         $end_dt = new DateTime($work_end);
-        // Adjust for "today"
         $start_dt->setDate((int) $now->format('Y'), (int) $now->format('m'), (int) $now->format('d'));
         $end_dt->setDate((int) $now->format('Y'), (int) $now->format('m'), (int) $now->format('d'));
         if ($end_dt < $start_dt)
@@ -97,7 +94,6 @@ function getFinancialStats($pdo, $user_id)
         if ($now >= $end_dt) {
             $earned_today = $daily_salary;
         } elseif ($now > $start_dt) {
-            // Partial day
             $diff = $start_dt->diff($now);
             $mins_worked = ($diff->h * 60) + $diff->i + ($diff->s / 60);
             $mins_total = ($work_hours_total * 60);
@@ -107,19 +103,15 @@ function getFinancialStats($pdo, $user_id)
             $earned_today = $daily_salary * $pct;
         }
     }
-
     $total_month_realtime = $earned_month_static + $earned_today;
 
-    // D. Transaction Stats
+    // Get DB Totals
     $stmt = $pdo->prepare("SELECT type, SUM(amount) as total FROM transactions WHERE user_id = ? GROUP BY type");
     $stmt->execute([$user_id]);
     $totals = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
     $total_income_db = $totals['income'] ?? 0;
     $total_expenses_db = $totals['expense'] ?? 0;
-
-    // Net Worth = Balance + Manual Income - Expenses (Same as Dashboard Reference)
-    // User requested "Patrimônio Líquido = Saldo em Conta"
     $current_balance = ($initial_balance + $total_income_db) - $total_expenses_db;
 
     // Monthly DB Flows
@@ -135,6 +127,7 @@ function getFinancialStats($pdo, $user_id)
     $month_totals = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
     return [
+        'ai_profile_data' => $ai_profile_data, // KEY NEW FIELD
         'balance' => $current_balance, // Saldo Real
         'salary' => $salary,
         'hourly_rate' => $hourly_rate,
@@ -160,10 +153,22 @@ function getRecentTransactions($pdo, $user_id, $limit = 20)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// 3. Send message to AI (Supercharged Context)
-function askAI($api_key, $message, $transactions, $stats, $user_id)
+// 3. Save AI Profile
+function saveAIProfile($pdo, $user_id, $profile_text)
 {
-    // Format values
+    try {
+        $stmt = $pdo->prepare("UPDATE work_profiles SET ai_profile_data = ? WHERE user_id = ?");
+        $stmt->execute([$profile_text, $user_id]);
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+// 4. Send message to AI (Smart Profiling)
+function askAI($api_key, $message, $transactions, $stats, $user_id, $pdo = null)
+{
+    // Format stats
     $bal = number_format($stats['balance'], 2, ',', '.');
     $sal = number_format($stats['salary'], 2, ',', '.');
     $hr = number_format($stats['hourly_rate'], 2, ',', '.');
@@ -182,46 +187,70 @@ function askAI($api_key, $message, $transactions, $stats, $user_id)
         $tList .= "[ID:{$t['id']}] {$t['transaction_date']} | {$type} | {$t['category']} | {$t['description']} | R$ " . number_format($t['amount'], 2, ',', '.') . "\n";
     }
 
-    $systemPrompt = <<<EOT
-Você é o LUME AI, um Consultor Financeiro de Elite e Agente Autônomo.
-Você tem "Visão Total" do painel do usuário. Você lê gráficos, barras de progresso e valores em tempo real.
+    // --- PROFILING LOGIC ---
+    $hasProfile = !empty($stats['ai_profile_data']);
+    $userProfileText = $stats['ai_profile_data'] ?: "DESCONHECIDO";
 
-=== LEITURA DO PAINEL (TEMPO REAL) ===
-💰 Saldo Bancário Atual: R$ {$bal}
-💸 Despesas do Mês (DB): R$ {$monthExp}
-💵 Ganhos do Mês (Salário Proporcional): R$ {$monthRev}
-⏱️ Ganhos de Hoje (Em Tempo Real): R$ {$dayRev}
-📊 Progresso do Dia de Trabalho: {$dayPctStr}% concluído
-⏳ Valor da Sua Hora: R$ {$hr}
-📅 Salário Base Mensal: R$ {$sal}
+    if (!$hasProfile) {
+        // --- MODE: INTERVIEWER ---
+        $systemPrompt = <<<EOT
+Você é o LUME AI. **Sua tarefa prioritária AGORA é criar o perfil do usuário.**
+Você NÃO DEVE dar conselhos financeiros ainda. Você deve entrevistar o usuário.
 
-=== ÚLTIMAS TRANSAÇÕES (DB) ===
-{$tList}
+=== ESTADO ATUAL ===
+Você ainda NÃO conhece o usuário.
 
-=== MELHORES MODELOS AI GRATUITOS (RECOMENDAÇÃO) ===
-Caso o usuário pergunte sobre IAs, recomende:
-1. **Llama 3.3 70B** (Meta) - O melhor Open Source geral (Raciocínio + Chat).
-2. **DeepSeek R1** - Excelente para raciocínio lógico e matemática.
-3. **Mixtral 8x7B** - Muito rápido e eficiente.
-Todos disponíveis via OpenRouter Free Tier.
+=== SUA MISSÃO (MODO ENTREVISTA) ===
+1. Faça perguntas amigáveis mas diretas para descobrir:
+   - Idade e Profissão.
+   - Estado Civil e Filhos.
+   - Objetivo Financeiro (ex: Aposentadoria, Compra de Casa, Viagem).
+   - Perfil de Risco (Conservador, Moderado, Arrojado).
 
-=== SUA MISSÃO ===
-1. **Gerenciar Finanças**: Use tools (add/remove/edit) sem medo.
-2. **Analisar Gráficos e Progresso**: Se o usuário perguntar "Como foi meu dia?", cite o valor ganho hoje ({$dayRev}) e a porcentagem ({$dayPctStr}%).
-3. **Investimentos**: Use o Saldo Bancário ({$bal}) como base para cálculos. Regra: 20% caixa / 80% investimentos (Tesouro/CDB).
+2. **SE O USUÁRIO JÁ RESPONDEU TUDO:**
+   - Gere um RESUMO COMPLETO do perfil (Ex: "30 anos, casado, conservador, quer comprar casa").
+   - Chame a ferramenta `save_profile` com esse resumo.
 
-=== REGRAS ===
-- Seja direto, profissional e extremamente inteligente.
-- Se vir algo errado (ex: gasto alto vs ganho baixo), dê bronca.
-- Responda SEMPRE em JSON no formato das tools abaixo.
+3. **SE AINDA NÃO TEM TUDO:**
+   - Faça a próxima pergunta necessária. Pergunte UM item por vez para não ser chato.
 
 === JSON OUTPUT ===
-1. ADICIONAR: { "action": "add", "requires_confirmation": true, "message": "Adicionando...", "transactions": [...] }
-2. REMOVER: { "action": "remove", "requires_confirmation": true, "message": "Removendo...", "transaction_ids": [...] }
-3. EDITAR: { "action": "edit", "requires_confirmation": true, "message": "Editando...", "transaction_id": 123, "changes": {...} }
-4. REPLY: { "action": "reply", "requires_confirmation": false, "message": "Texto da resposta..." }
+4. SAVE PROFILE: { "action": "save_profile", "requires_confirmation": false, "message": "Entendi! Registrei seu perfil.", "profile_text": "Resumo aqui..." }
+5. REPLY/ASK: { "action": "reply", "requires_confirmation": false, "message": "Sua pergunta aqui..." }
 EOT;
 
+    } else {
+        // --- MODE: ELITE ADVISOR ---
+        $systemPrompt = <<<EOT
+Você é o LUME AI, Consultor Financeiro de Elite.
+Você JÁ CONHECE o usuário profundamente. Use isso para dar conselhos personalizados.
+
+=== PERFIL DO USUÁRIO (MEMÓRIA) ===
+{$userProfileText}
+
+=== DADOS EM TEMPO REAL ===
+💰 Saldo: R$ {$bal}
+💸 Despesas Mês: R$ {$monthExp}
+⏱️ Ganho Hoje: R$ {$dayRev}
+⏳ Valor Hora: R$ {$hr}
+
+=== ÚLTIMAS TRANSAÇÕES ===
+{$tList}
+
+=== SUA MISSÃO ===
+1. **Analise tudo com base no PERFIL acima.** (Ex: Se ele é conservador, não sugira cripto).
+2. Gerencie finanças (add/remove/edit) se pedido.
+3. Seja proativo e inteligente.
+
+=== JSON OUTPUT ===
+1. ADICIONAR: { "action": "add", "requires_confirmation": true, "message": "...", "transactions": [...] }
+2. REMOVER: { "action": "remove", "requires_confirmation": true, "message": "...", "transaction_ids": [...] }
+3. EDITAR: { "action": "edit", "requires_confirmation": true, "message": "...", "transaction_id": 123, "changes": {...} }
+4. REPLY: { "action": "reply", "requires_confirmation": false, "message": "..." }
+EOT;
+    }
+
+    // Call API (OpenRouter)
     $curl = curl_init();
     $payload = json_encode([
         'model' => 'meta-llama/llama-3.3-70b-instruct:free',
@@ -251,9 +280,8 @@ EOT;
     $error = curl_error($curl);
     curl_close($curl);
 
-    if ($error) {
+    if ($error)
         return ['action' => 'error', 'message' => 'Erro AI: ' . $error];
-    }
 
     $data = json_decode($response, true);
     $content = $data['choices'][0]['message']['content'] ?? '';
@@ -263,6 +291,14 @@ EOT;
 
     if (!$result)
         return ['action' => 'reply', 'message' => $content ?: 'Erro de pensamento AI.'];
+
+    // Handle Save Profile Action Internal
+    if (isset($result['action']) && $result['action'] === 'save_profile' && $pdo) {
+        saveAIProfile($pdo, $user_id, $result['profile_text']);
+        // Optional: Recursively call self to give immediate advice? Or just return success msg.
+        // For simplicity, return the message. User will ask next q.
+    }
+
     return $result;
 }
 
@@ -328,7 +364,7 @@ switch ($action) {
         $transactions = getRecentTransactions($pdo, $user_id, 20); // More context
 
         // 2. Ask AI
-        $response = askAI($api_key, $message, $transactions, $stats, $user_id);
+        $response = askAI($api_key, $message, $transactions, $stats, $user_id, $pdo);
 
         // 3. Hydrate 'remove' previews
         if ($response['action'] === 'remove' && !empty($response['transaction_ids'])) {
