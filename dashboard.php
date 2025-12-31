@@ -144,7 +144,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1E3A5F">
@@ -152,7 +152,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Lume">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
-    
+
     <style>
         :root {
             --bg: #F5F5F7;
@@ -417,10 +417,13 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     <i data-lucide="edit-2" width="14"></i> Editar
                 </a>
 
-                <button onclick="toggleTheme()" class="btn-header" style="background:var(--card); border:1px solid var(--border); color:var(--text);" title="Alternar tema (Claro/Escuro/Solarized)">
+                <button onclick="toggleTheme()" class="btn-header"
+                    style="background:var(--card); border:1px solid var(--border); color:var(--text);"
+                    title="Alternar tema (Claro/Escuro/Solarized)">
                     <i data-lucide="moon" width="14" id="theme-icon"></i>
                 </button>
-                <a href="logout.php" class="btn-header" style="background:var(--danger); border:none; color:white;" title="Sair">
+                <a href="logout.php" class="btn-header" style="background:var(--danger); border:none; color:white;"
+                    title="Sair">
                     <i data-lucide="log-out" width="14"></i>
                 </a>
             </div>
@@ -560,28 +563,34 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         <div style="margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 class="recents-title" style="margin:0;">Panorama Financeiro</h3>
-                <button onclick="generateAIInsights()" 
+                <button onclick="generateAIInsights()"
                     style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
                     <i data-lucide="sparkles" width="14"></i> Análise Inteligente
                 </button>
             </div>
             <div class="analytics-grid" style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
                 <!-- Evolution Chart -->
-                <div style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                    <div style="font-weight:600; font-size:14px; color:var(--text); margin-bottom:16px;">Evolução do Saldo (Mês Atual)</div>
+                <div
+                    style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                    <div style="font-weight:600; font-size:14px; color:var(--text); margin-bottom:16px;">Evolução do
+                        Saldo (Mês Atual)</div>
                     <div style="height:300px; width:100%;">
                         <canvas id="evolutionChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Top 5 Expenses -->
-                <div style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                <div
+                    style="background:var(--card); border-radius:12px; padding:20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                         <div style="font-weight:600; font-size:14px; color:var(--text);">🏆 Top 5 Despesas</div>
-                        <div id="comparison-badge" style="display:none; align-items:center; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600;"></div>
+                        <div id="comparison-badge"
+                            style="display:none; align-items:center; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600;">
+                        </div>
                     </div>
                     <div id="top-expenses-list" style="display:flex; flex-direction:column; gap:12px;">
-                        <div style="color:var(--sub); font-size:13px; text-align:center; padding:20px;">Carregando...</div>
+                        <div style="color:var(--sub); font-size:13px; text-align:center; padding:20px;">Carregando...
+                        </div>
                     </div>
                 </div>
             </div>
@@ -591,12 +600,13 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         <div style="margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 class="recents-title" style="margin:0;">💰 Orçamentos por Categoria</h3>
-                <button onclick="openBudgetModal()" 
+                <button onclick="openBudgetModal()"
                     style="background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer;">
                     + Novo Orçamento
                 </button>
             </div>
-            <div id="budgets-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+            <div id="budgets-container"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
                 <!-- Budgets loaded via JS -->
                 <div style="color:var(--sub); font-size:14px; padding:20px; text-align:center;">
                     Carregando orçamentos...
@@ -605,12 +615,14 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         </div>
 
         <!-- Budget Modal -->
-        <div id="budget-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+        <div id="budget-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
             <div style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:400px;">
                 <h3 style="margin-bottom:16px; color:var(--text);">Novo Orçamento</h3>
                 <form onsubmit="saveBudget(event)">
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">CATEGORIA</label>
-                    <select id="budget-category" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <select id="budget-category" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
                         <option value="">Selecione...</option>
                         <option value="Alimentação">🍔 Alimentação</option>
                         <option value="Mercado">🛒 Mercado</option>
@@ -632,13 +644,15 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     </select>
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">LIMITE MENSAL (R$)</label>
-                    <input type="number" id="budget-limit" step="0.01" min="0.01" required 
-                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" 
+                    <input type="number" id="budget-limit" step="0.01" min="0.01" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
                         placeholder="500.00">
 
                     <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="closeBudgetModal()" style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
-                        <button type="submit" style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
+                        <button type="button" onclick="closeBudgetModal()"
+                            style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
+                        <button type="submit"
+                            style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
                     </div>
                 </form>
             </div>
@@ -648,12 +662,13 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         <div style="margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 class="recents-title" style="margin:0;">🔄 Transações Recorrentes</h3>
-                <button onclick="openRecurringModal()" 
+                <button onclick="openRecurringModal()"
                     style="background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer;">
                     + Nova Recorrência
                 </button>
             </div>
-            <div id="recurring-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
+            <div id="recurring-container"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
                 <div style="color:var(--sub); font-size:14px; padding:20px; text-align:center;">
                     Carregando...
                 </div>
@@ -661,30 +676,42 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         </div>
 
         <!-- Recurring Modal -->
-        <div id="recurring-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
-            <div style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
+        <div id="recurring-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+            <div
+                style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
                 <h3 style="margin-bottom:16px; color:var(--text);">Nova Transação Recorrente</h3>
                 <form onsubmit="saveRecurring(event)">
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">TIPO</label>
-                    <div style="display:flex; gap:8px; margin-bottom:16px;">
-                        <label style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; background:var(--card);">
-                            <input type="radio" name="rec-type" value="income" style="display:none;">
+                    <div style="display:flex; gap:8px; margin-bottom:16px;" id="rec-type-selector">
+                        <label class="rec-type-option"
+                            style="flex:1; padding:12px; border:2px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; background:var(--card); transition: all 0.2s;">
+                            <input type="radio" name="rec-type" value="income" style="display:none;"
+                                onchange="updateRecTypeVisual()">
                             <span>💰 Receita</span>
                         </label>
-                        <label style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; background:var(--card);">
-                            <input type="radio" name="rec-type" value="expense" checked style="display:none;">
+                        <label class="rec-type-option rec-type-selected"
+                            style="flex:1; padding:12px; border:2px solid var(--danger); border-radius:8px; text-align:center; cursor:pointer; background:rgba(255,59,48,0.1); transition: all 0.2s;">
+                            <input type="radio" name="rec-type" value="expense" checked style="display:none;"
+                                onchange="updateRecTypeVisual()">
                             <span>💸 Despesa</span>
                         </label>
                     </div>
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">DESCRIÇÃO</label>
-                    <input type="text" id="rec-description" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" placeholder="Ex: Netflix, Salário...">
+                    <input type="text" id="rec-description" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="Ex: Netflix, Salário...">
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">VALOR (R$)</label>
-                    <input type="number" id="rec-amount" step="0.01" min="0.01" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" placeholder="100.00">
+                    <input type="number" id="rec-amount" step="0.01" min="0.01" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="1412.00">
+
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">CATEGORIA</label>
-                    <select id="rec-category" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <select id="rec-category"
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
                         <option value="Salário">💰 Salário</option>
                         <option value="Assinaturas">📺 Assinaturas</option>
                         <option value="Contas">📃 Contas</option>
@@ -693,7 +720,8 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     </select>
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">FREQUÊNCIA</label>
-                    <select id="rec-frequency" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <select id="rec-frequency"
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
                         <option value="monthly">Mensal</option>
                         <option value="weekly">Semanal</option>
                         <option value="yearly">Anual</option>
@@ -701,16 +729,95 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">DIA DO MÊS</label>
                     <div style="display:flex; gap:8px; margin-bottom:16px;">
-                        <input type="number" id="rec-day" min="1" max="31" value="1" style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);">
-                        <label style="display:flex; align-items:center; gap:6px; padding:0 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; white-space:nowrap;">
-                            <input type="checkbox" id="rec-last-day" onchange="document.getElementById('rec-day').disabled = this.checked;">
+                        <input type="number" id="rec-day" min="1" max="31" value="1"
+                            style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);">
+                        <label
+                            style="display:flex; align-items:center; gap:6px; padding:0 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; white-space:nowrap;">
+                            <input type="checkbox" id="rec-last-day"
+                                onchange="document.getElementById('rec-day').disabled = this.checked;">
                             <span style="font-size:12px;">Último dia</span>
                         </label>
                     </div>
 
                     <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="closeRecurringModal()" style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
-                        <button type="submit" style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
+                        <button type="button" onclick="closeRecurringModal()"
+                            style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
+                        <button type="submit"
+                            style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Recurring Modal -->
+        <div id="edit-recurring-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+            <div
+                style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
+                <h3 style="margin-bottom:16px; color:var(--text);">Editar Transação Recorrente</h3>
+                <form onsubmit="updateRecurring(event)">
+                    <input type="hidden" id="edit-rec-id">
+
+                    <label style="font-size:12px; font-weight:600; color:var(--sub);">TIPO</label>
+                    <div style="display:flex; gap:8px; margin-bottom:16px;" id="edit-rec-type-selector">
+                        <label class="edit-rec-type-option"
+                            style="flex:1; padding:12px; border:2px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; background:var(--card); transition: all 0.2s;">
+                            <input type="radio" name="edit-rec-type" value="income" style="display:none;"
+                                onchange="updateEditRecTypeVisual()">
+                            <span>💰 Receita</span>
+                        </label>
+                        <label class="edit-rec-type-option"
+                            style="flex:1; padding:12px; border:2px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; background:var(--card); transition: all 0.2s;">
+                            <input type="radio" name="edit-rec-type" value="expense" style="display:none;"
+                                onchange="updateEditRecTypeVisual()">
+                            <span>💸 Despesa</span>
+                        </label>
+                    </div>
+
+                    <label style="font-size:12px; font-weight:600; color:var(--sub);">DESCRIÇÃO</label>
+                    <input type="text" id="edit-rec-description" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+
+                    <label style="font-size:12px; font-weight:600; color:var(--sub);">VALOR (R$)</label>
+                    <input type="number" id="edit-rec-amount" step="0.01" min="0.01" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="1412.00">
+
+                    <label style="font-size:12px; font-weight:600; color:var(--sub);">CATEGORIA</label>
+                    <select id="edit-rec-category"
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                        <option value="Salário">💰 Salário</option>
+                        <option value="Assinaturas">📺 Assinaturas</option>
+                        <option value="Contas">📃 Contas</option>
+                        <option value="Moradia">🏠 Moradia</option>
+                        <option value="Outros">📦 Outros</option>
+                    </select>
+
+                    <label style="font-size:12px; font-weight:600; color:var(--sub);">FREQUÊNCIA</label>
+                    <select id="edit-rec-frequency"
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                        <option value="monthly">Mensal</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="yearly">Anual</option>
+                    </select>
+
+                    <label style="font-size:12px; font-weight:600; color:var(--sub);">DIA DO MÊS</label>
+                    <div style="display:flex; gap:8px; margin-bottom:16px;">
+                        <input type="number" id="edit-rec-day" min="1" max="31"
+                            style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);">
+                        <label
+                            style="display:flex; align-items:center; gap:6px; padding:0 12px; border:1px solid var(--border); border-radius:8px; cursor:pointer; white-space:nowrap;">
+                            <input type="checkbox" id="edit-rec-last-day"
+                                onchange="document.getElementById('edit-rec-day').disabled = this.checked;">
+                            <span style="font-size:12px;">Último dia</span>
+                        </label>
+                    </div>
+
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" onclick="closeEditRecurringModal()"
+                            style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
+                        <button type="submit"
+                            style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
                     </div>
                 </form>
             </div>
@@ -720,50 +827,61 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
         <div style="margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 class="recents-title" style="margin:0;">📈 Meus Investimentos</h3>
-                <button onclick="openInvestmentModal()" 
+                <button onclick="openInvestmentModal()"
                     style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer;">
                     + Novo Investimento
                 </button>
             </div>
-            
+
             <!-- Investment Summary -->
-            <div id="investment-summary" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:20px;">
+            <div id="investment-summary"
+                style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:20px;">
                 <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
                     <div style="font-size:12px; color:var(--sub); margin-bottom:4px;">Total Investido</div>
-                    <div id="inv-total-invested" style="font-size:20px; font-weight:700; color:var(--text);">R$ 0,00</div>
+                    <div id="inv-total-invested" style="font-size:20px; font-weight:700; color:var(--text);">R$ 0,00
+                    </div>
                 </div>
                 <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
                     <div style="font-size:12px; color:var(--sub); margin-bottom:4px;">Valor Atual</div>
-                    <div id="inv-total-current" style="font-size:20px; font-weight:700; color:var(--text);">R$ 0,00</div>
+                    <div id="inv-total-current" style="font-size:20px; font-weight:700; color:var(--text);">R$ 0,00
+                    </div>
                 </div>
                 <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
                     <div style="font-size:12px; color:var(--sub); margin-bottom:4px;">Rendimento</div>
-                    <div id="inv-total-gain" style="font-size:20px; font-weight:700; color:var(--success);">+R$ 0,00</div>
+                    <div id="inv-total-gain" style="font-size:20px; font-weight:700; color:var(--success);">+R$ 0,00
+                    </div>
                 </div>
                 <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
                     <div style="font-size:12px; color:var(--sub); margin-bottom:4px;">Rentabilidade</div>
                     <div id="inv-total-yield" style="font-size:20px; font-weight:700; color:var(--success);">0%</div>
                 </div>
             </div>
-            
+
             <!-- Investment Cards -->
-            <div id="investments-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
-                <div style="color:var(--sub); font-size:14px; padding:40px; text-align:center; background:var(--card); border-radius:12px;">
+            <div id="investments-container"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+                <div
+                    style="color:var(--sub); font-size:14px; padding:40px; text-align:center; background:var(--card); border-radius:12px;">
                     Carregando investimentos...
                 </div>
             </div>
         </div>
 
         <!-- Investment Modal (New) -->
-        <div id="investment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
-            <div style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
+        <div id="investment-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+            <div
+                style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:420px; max-height:90vh; overflow-y:auto;">
                 <h3 style="margin-bottom:16px; color:var(--text);">📈 Novo Investimento</h3>
                 <form onsubmit="saveInvestment(event)">
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">NOME DO INVESTIMENTO</label>
-                    <input type="text" id="inv-name" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" placeholder="Ex: Nubank RDB, Tesouro Selic...">
+                    <input type="text" id="inv-name" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="Ex: Nubank RDB, Tesouro Selic...">
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">TIPO</label>
-                    <select id="inv-type" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <select id="inv-type"
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
                         <option value="CDB">💰 CDB</option>
                         <option value="Tesouro">🏛️ Tesouro Direto</option>
                         <option value="LCI/LCA">🏠 LCI/LCA</option>
@@ -775,51 +893,66 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     </select>
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">VALOR INVESTIDO (R$)</label>
-                    <input type="number" id="inv-amount" step="0.01" min="0.01" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" placeholder="1350.00">
+                    <input type="number" id="inv-amount" step="0.01" min="0.01" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="500.00">
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">DATA DO INVESTIMENTO</label>
-                    <input type="date" id="inv-date" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <input type="date" id="inv-date" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">TAXA ESPERADA (%)</label>
                     <div style="display:flex; gap:8px; margin-bottom:16px;">
-                        <input type="number" id="inv-rate" step="0.01" min="0" style="flex:2; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);" placeholder="1.0">
-                        <select id="inv-rate-period" style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);">
+                        <input type="number" id="inv-rate" step="0.01" min="0"
+                            style="flex:2; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);"
+                            placeholder="1.0">
+                        <select id="inv-rate-period"
+                            style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);">
                             <option value="monthly">a.m.</option>
                             <option value="yearly">a.a.</option>
                         </select>
                     </div>
 
                     <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="closeInvestmentModal()" style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
-                        <button type="submit" style="flex:1; padding:12px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
+                        <button type="button" onclick="closeInvestmentModal()"
+                            style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
+                        <button type="submit"
+                            style="flex:1; padding:12px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Salvar</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Update Value Modal -->
-        <div id="update-value-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+        <div id="update-value-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
             <div style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:360px;">
                 <h3 style="margin-bottom:16px; color:var(--text);">💹 Atualizar Valor</h3>
                 <form onsubmit="updateInvestmentValue(event)">
                     <input type="hidden" id="update-inv-id">
-                    
+
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">VALOR ATUAL (R$)</label>
-                    <input type="number" id="update-new-value" step="0.01" min="0" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" placeholder="1356.36">
+                    <input type="number" id="update-new-value" step="0.01" min="0" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="1356.36">
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">DATA DA ATUALIZAÇÃO</label>
-                    <input type="date" id="update-date" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <input type="date" id="update-date" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
 
                     <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="closeUpdateModal()" style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
-                        <button type="submit" style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Atualizar</button>
+                        <button type="button" onclick="closeUpdateModal()"
+                            style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
+                        <button type="submit"
+                            style="flex:1; padding:12px; border:none; background:var(--accent); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Atualizar</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Deposit Modal -->
-        <div id="deposit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+        <div id="deposit-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
             <div style="background:var(--card); padding:24px; border-radius:16px; width:90%; max-width:360px;">
                 <h3 style="margin-bottom:16px; color:var(--text);">💰 Novo Aporte</h3>
                 <div style="font-size:13px; color:var(--sub); margin-bottom:16px;">
@@ -827,16 +960,21 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 </div>
                 <form onsubmit="saveDeposit(event)">
                     <input type="hidden" id="deposit-inv-id">
-                    
+
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">VALOR DO APORTE (R$)</label>
-                    <input type="number" id="deposit-amount" step="0.01" min="0.01" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);" placeholder="639.14">
+                    <input type="number" id="deposit-amount" step="0.01" min="0.01" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);"
+                        placeholder="639.14">
 
                     <label style="font-size:12px; font-weight:600; color:var(--sub);">DATA DO APORTE</label>
-                    <input type="date" id="deposit-date" required style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
+                    <input type="date" id="deposit-date" required
+                        style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; background:var(--card); color:var(--text);">
 
                     <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="closeDepositModal()" style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
-                        <button type="submit" style="flex:1; padding:12px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Registrar</button>
+                        <button type="button" onclick="closeDepositModal()"
+                            style="flex:1; padding:12px; border:1px solid var(--border); background:var(--card); border-radius:8px; cursor:pointer; color:var(--text);">Cancelar</button>
+                        <button type="submit"
+                            style="flex:1; padding:12px; border:none; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border-radius:8px; cursor:pointer; font-weight:600;">Registrar</button>
                     </div>
                 </form>
             </div>
@@ -847,7 +985,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                 <h3 class="recents-title" style="margin:0;">Histórico Financeiro</h3>
                 <div style="display:flex; gap:10px;">
-                    <button onclick="exportCSV()" 
+                    <button onclick="exportCSV()"
                         style="background:var(--card); border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px; transition: background 0.2s;">
                         <i data-lucide="download" width="14"></i> Exportar
                     </button>
@@ -861,8 +999,10 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             <!-- SEARCH & FILTERS -->
             <div style="display:flex; gap:10px; margin-bottom:16px;">
                 <div style="flex:2; position:relative;">
-                    <i data-lucide="search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--sub); width:16px;"></i>
-                    <input type="text" id="filter-search" placeholder="Buscar transação..." onkeyup="filterTransactions()"
+                    <i data-lucide="search"
+                        style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--sub); width:16px;"></i>
+                    <input type="text" id="filter-search" placeholder="Buscar transação..."
+                        onkeyup="filterTransactions()"
                         style="width:100%; padding:10px 10px 10px 36px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:13px;">
                 </div>
                 <select id="filter-category" onchange="filterTransactions()"
@@ -1248,7 +1388,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
             // ==================== THEME MANAGEMENT ====================
             const themes = ['light', 'dark', 'solarized'];
-            
+
             function toggleTheme() {
                 const currentTheme = localStorage.getItem('lume-theme') || 'light';
                 let nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
@@ -1258,13 +1398,13 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             function setTheme(theme) {
                 // Clear all theme classes
                 document.body.classList.remove('dark-mode', 'solarized-theme');
-                
+
                 if (theme === 'dark') {
                     document.body.classList.add('dark-mode');
                 } else if (theme === 'solarized') {
                     document.body.classList.add('solarized-theme');
                 }
-                
+
                 localStorage.setItem('lume-theme', theme);
                 updateThemeIcon(theme);
             }
@@ -1290,7 +1430,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     localStorage.setItem('lume-theme', 'dark');
                     localStorage.removeItem('lume-dark-mode');
                 }
-                
+
                 const savedTheme = localStorage.getItem('lume-theme') || 'light';
                 setTheme(savedTheme);
             })();
@@ -1669,8 +1809,8 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     const response = await fetch('/ai_assistant.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            action: 'chat', 
+                        body: JSON.stringify({
+                            action: 'chat',
                             message: message,
                             history: chatHistory.slice(0, -1) // Send history without current message
                         })
@@ -1683,7 +1823,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     msgs.removeChild(msgs.lastChild);
 
                     const aiMessage = result.message || 'Desculpe, não entendi.';
-                    
+
                     // Add AI response
                     addMessage(aiMessage, false);
 
@@ -1890,7 +2030,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     const data = await response.json();
 
                     const container = document.getElementById('budgets-container');
-                    
+
                     if (data.status !== 'success' || data.budgets.length === 0) {
                         container.innerHTML = `
                             <div style="grid-column: 1/-1; color:var(--sub); font-size:14px; padding:40px; text-align:center; background:var(--card); border-radius:12px;">
@@ -1902,10 +2042,10 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
                     container.innerHTML = data.budgets.map(b => {
                         const pct = Math.min(b.percentage, 100);
-                        const color = b.percentage >= 100 ? 'var(--danger)' : 
-                                      b.percentage >= 80 ? '#FFA500' : 'var(--success)';
+                        const color = b.percentage >= 100 ? 'var(--danger)' :
+                            b.percentage >= 80 ? '#FFA500' : 'var(--success)';
                         const statusIcon = b.over_budget ? '⚠️' : b.percentage >= 80 ? '⚡' : '✓';
-                        
+
                         return `
                             <div style="background:var(--card); border-radius:12px; padding:16px; position:relative;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1983,7 +2123,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     const data = await response.json();
 
                     const container = document.getElementById('recurring-container');
-                    
+
                     if (data.status !== 'success' || data.recurring.length === 0) {
                         container.innerHTML = `
                             <div style="grid-column: 1/-1; color:var(--sub); font-size:14px; padding:40px; text-align:center; background:var(--card); border-radius:12px;">
@@ -2002,7 +2142,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         const nextDate = new Date(r.next_date + 'T00:00:00');
                         const formattedDate = nextDate.toLocaleDateString('pt-BR');
                         const dayLabel = r.day_of_month == -1 ? 'Último dia' : 'Dia ' + r.day_of_month;
-                        
+
                         return `
                             <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid ${color};">
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -2073,7 +2213,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             }
 
             // Load recurring on page load
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 loadRecurring();
             });
 
@@ -2087,7 +2227,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 document.getElementById('rec-amount').value = r.amount;
                 document.getElementById('rec-category').value = r.category;
                 document.getElementById('rec-frequency').value = r.frequency;
-                
+
                 if (r.day_of_month == -1) {
                     document.getElementById('rec-last-day').checked = true;
                     document.getElementById('rec-day').disabled = true;
@@ -2097,14 +2237,14 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     document.getElementById('rec-day').disabled = false;
                     document.getElementById('rec-day').value = r.day_of_month;
                 }
-                
+
                 // Open modal
                 document.getElementById('recurring-modal').style.display = 'flex';
             }
 
             // Override saveRecurring to handle edit mode
             const originalSaveRecurring = saveRecurring;
-            saveRecurring = async function(event) {
+            saveRecurring = async function (event) {
                 event.preventDefault();
                 const type = document.querySelector('input[name="rec-type"]:checked').value;
                 const description = document.getElementById('rec-description').value;
@@ -2139,7 +2279,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
             // Reset edit mode when closing modal
             const originalCloseRecurringModal = closeRecurringModal;
-            closeRecurringModal = function() {
+            closeRecurringModal = function () {
                 editingRecurringId = null;
                 document.getElementById('recurring-modal').style.display = 'none';
                 document.getElementById('rec-description').value = '';
@@ -2155,7 +2295,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 if (detailRow) {
                     const isVisible = detailRow.style.display !== 'none';
                     detailRow.style.display = isVisible ? 'none' : 'table-row';
-                    
+
                     // Toggle icon
                     const icon = document.querySelector('.expand-icon-' + id);
                     if (icon) {
@@ -2171,19 +2311,19 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 document.getElementById('edit-amount').value = transaction.amount;
                 document.getElementById('edit-category').value = transaction.category;
                 document.getElementById('edit-date').value = transaction.transaction_date;
-                
+
                 if (transaction.type === 'income') {
                     document.getElementById('edit-type-income').checked = true;
                 } else {
                     document.getElementById('edit-type-expense').checked = true;
                 }
-                
+
                 document.getElementById('edit-modal').style.display = 'flex';
             }
 
             async function saveEdit(event) {
                 event.preventDefault();
-                
+
                 const id = document.getElementById('edit-id').value;
                 const type = document.querySelector('input[name="edit-type"]:checked').value;
                 const description = document.getElementById('edit-description').value;
@@ -2199,7 +2339,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     });
 
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         alert('✅ Transação atualizada com sucesso!');
                         location.reload();
@@ -2213,14 +2353,14 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
 
             async function deleteTransaction(id) {
                 if (!confirm('Tem certeza que deseja remover esta transação?')) return;
-                
+
                 try {
                     const response = await fetch('/api/transactions.php?id=' + id, {
                         method: 'DELETE'
                     });
 
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         alert('✅ Transação removida com sucesso!');
                         location.reload();
@@ -2239,16 +2379,16 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 try {
                     const response = await fetch(`/api/analytics.php?type=comparison&month=${currentMonth}&year=${currentYear}`);
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         const badgeObj = document.getElementById('comparison-badge');
                         if (!badgeObj) return;
 
                         const diff = result.percent;
                         const direction = result.diff > 0 ? 'up' : 'down'; // up = spent more
-                        
+
                         let text, icon, color, bg;
-                        
+
                         if (direction === 'down') {
                             text = `${Math.abs(diff)}% vs mês passado`;
                             icon = '⬇️';
@@ -2260,14 +2400,14 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             color = '#ef4444'; // Red
                             bg = 'rgba(239, 68, 68, 0.1)';
                         }
-                        
+
                         if (Math.abs(diff) < 1) {
                             text = 'Estável vs mês passado';
                             icon = '➡️';
                             color = 'var(--sub)';
                             bg = 'var(--border)';
                         }
-                        
+
                         badgeObj.style.display = 'inline-flex';
                         badgeObj.innerHTML = `<span style="margin-right:4px;">${icon}</span> ${text}`;
                         badgeObj.style.color = color;
@@ -2282,23 +2422,23 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 try {
                     const response = await fetch(`/api/analytics.php?type=evolution&month=${currentMonth}&year=${currentYear}`);
                     const result = await response.json();
-                    
+
                     loadComparison();
 
                     if (result.status === 'success') {
                         const ctx = document.getElementById('evolutionChart').getContext('2d');
                         const labels = result.data.map(d => d.day);
                         const data = result.data.map(d => d.balance);
-                        
+
                         // Destroy old chart if exists
                         if (evolutionChartInstance) {
                             evolutionChartInstance.destroy();
                         }
-                        
+
                         const isDark = document.body.classList.contains('dark-mode') || document.body.classList.contains('solarized-theme');
                         const gridColor = isDark ? '#38383A' : '#E5E5EA';
                         const textColor = isDark ? '#FFF' : '#1D1D1F';
-                        const accentColor = '#34C759'; 
+                        const accentColor = '#34C759';
 
                         evolutionChartInstance = new Chart(ctx, {
                             type: 'line',
@@ -2339,7 +2479,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                     legend: { display: false },
                                     tooltip: {
                                         callbacks: {
-                                            label: function(context) {
+                                            label: function (context) {
                                                 return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                                             }
                                         }
@@ -2357,7 +2497,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 try {
                     const response = await fetch(`/api/analytics.php?type=top_expenses&month=${currentMonth}&year=${currentYear}`);
                     const result = await response.json();
-                    
+
                     const container = document.getElementById('top-expenses-list');
                     if (result.status === 'success' && result.data.length > 0) {
                         container.innerHTML = result.data.map(t => `
@@ -2371,13 +2511,13 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                         <div style="font-size:11px; color:var(--sub);">${formatDate(t.transaction_date)} • ${t.category}</div>
                                     </div>
                                 </div>
-                                <div style="font-weight:600; font-size:13px; color:var(--danger);">- R$ ${parseFloat(t.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                                <div style="font-weight:600; font-size:13px; color:var(--danger);">- R$ ${parseFloat(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                             </div>
                         `).join('');
                     } else {
                         container.innerHTML = '<div style="color:var(--sub); font-size:13px; text-align:center; padding:20px;">Nenhuma despesa este mês.</div>';
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error('Error loading top expenses:', e);
                 }
             }
@@ -2428,7 +2568,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 if (!message) return;
 
                 const messagesContainer = document.getElementById('chat-messages');
-                
+
                 // Append User Message
                 if (role === 'user') {
                     if (!msgOverride) input.value = '';
@@ -2447,7 +2587,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         body: JSON.stringify({ action: 'chat', message: message, history: getChatHistory() })
                     });
                     const data = await response.json();
-                    
+
                     // Remove Loading
                     document.getElementById(loadingId).remove();
 
@@ -2471,12 +2611,12 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 div.style.display = 'flex';
                 div.style.gap = '10px';
                 div.style.marginBottom = '12px';
-                
+
                 const isUser = role === 'user';
-                const avatar = isUser 
+                const avatar = isUser
                     ? `<div style="width:28px; height:28px; background:#555; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white;"><i data-lucide="user" width="14"></i></div>`
                     : `<div style="width:28px; height:28px; background:#10a37f; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white;"><i data-lucide="bot" width="16"></i></div>`;
-                
+
                 div.innerHTML = `
                     ${avatar}
                     <div style="background:${isUser ? 'var(--card)' : 'transparent'}; padding:${isUser ? '8px 12px' : '0'}; border-radius:8px; border:${isUser ? '1px solid var(--border)' : 'none'}; font-size:14px; line-height:1.5; color:var(--text); flex:1;">
@@ -2498,16 +2638,16 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             async function generateAIInsights() {
                 toggleChat();
                 appendMessage('ai', '🔍 Analisando seus dados do mês...');
-                
+
                 try {
                     const response = await fetch(`/api/analytics.php?type=ai_stats&month=${currentMonth}&year=${currentYear}`);
                     const data = await response.json();
-                    
+
                     if (data.status === 'success') {
                         const t = data.totals;
                         const cats = data.categories.map(c => `${c.category} (R$ ${parseFloat(c.total).toFixed(2)})`).join(', ');
                         const top = data.top_expenses.map(e => `${e.description} (R$ ${parseFloat(e.amount).toFixed(2)})`).join(', ');
-                        
+
                         const prompt = `
                         Analise meus dados financeiros deste mês:
                         - Receitas: R$ ${parseFloat(t.total_income).toFixed(2)}
@@ -2518,7 +2658,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         Identifique 3 pontos de atenção e me dê uma dica prática para economizar.
                         Seja curto, direto e use emojis.
                         `;
-                        
+
                         await sendChatMessage(prompt, 'hidden'); // user role but hidden? No, send as user so user sees what was asked.
                         // Actually let's just trigger the internal logic or show "Solicitando análise..."
                     }
@@ -2554,14 +2694,14 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             const sign = isIncome ? '+' : '-';
                             const hasTranscription = t.transcription && t.transcription.trim() !== '';
                             const tJson = JSON.stringify(t).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-                            
+
                             // Edit Icon vs Mic Icon
-                            const typeIcon = hasTranscription ? 
-                                `<i data-lucide="mic" width="14" style="color:var(--accent); vertical-align:middle; margin-right:6px;" title="Voz"></i>` : 
+                            const typeIcon = hasTranscription ?
+                                `<i data-lucide="mic" width="14" style="color:var(--accent); vertical-align:middle; margin-right:6px;" title="Voz"></i>` :
                                 `<i data-lucide="edit-3" width="14" style="color:var(--sub); vertical-align:middle; margin-right:6px;" title="Manual"></i>`;
 
-                            const expandIcon = hasTranscription ? 
-                                `<i data-lucide="chevron-down" width="16" class="expand-icon-${t.id}"></i>` : 
+                            const expandIcon = hasTranscription ?
+                                `<i data-lucide="chevron-down" width="16" class="expand-icon-${t.id}"></i>` :
                                 `<span style="width:16px; display:inline-block;"></span>`;
 
                             const rowHtml = `
@@ -2572,7 +2712,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                     </td>
                                     <td style="padding:12px 16px;"><span style="background:var(--bg); padding:4px 8px; border-radius:4px; font-size:11px;">${t.category}</span></td>
                                     <td style="padding:12px 16px; color:var(--sub);">${formatDate(t.transaction_date)}</td>
-                                    <td style="padding:12px 16px; font-weight:600; color:${color};">${sign} R$ ${parseFloat(t.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                    <td style="padding:12px 16px; font-weight:600; color:${color};">${sign} R$ ${parseFloat(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                                     <td style="padding:12px 16px; text-align:right;" onclick="event.stopPropagation();">
                                         <button onclick="openEditModal(${tJson})" style="background:transparent; border:1px solid var(--border); padding:6px 10px; border-radius:6px; cursor:pointer; margin-right:4px;">
                                             <i data-lucide="edit-2" width="14"></i>
@@ -2583,7 +2723,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                     </td>
                                 </tr>
                             `;
-                            
+
                             const detailHtml = hasTranscription ? `
                                 <tr class="transaction-detail" id="detail-${t.id}" style="display:none; background:#FAFAFA;">
                                     <td colspan="6" style="padding:16px 16px 16px 48px;">
@@ -2596,7 +2736,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                         </div>
                                     </td>
                                 </tr>` : '';
-                                
+
                             return rowHtml + detailHtml;
                         }).join('');
                         lucide.createIcons();
@@ -2605,21 +2745,21 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     console.error('Filter error', e);
                 }
             }
-            
+
             async function deleteTransaction(id) {
-                if(!confirm('Excluir transação?')) return;
-                
+                if (!confirm('Excluir transação?')) return;
+
                 try {
                     const response = await fetch(`/api/transactions.php?id=${id}`, { method: 'DELETE' });
                     const result = await response.json();
-                    if(result.status === 'success') {
+                    if (result.status === 'success') {
                         filterTransactions(); // Reload list
                         loadEvolutionChart(); // Update chart
                         loadCategoryData();   // Update pies
                     } else {
                         alert('Erro: ' + result.message);
                     }
-                } catch(e) {
+                } catch (e) {
                     alert('Erro ao excluir');
                 }
             }
@@ -2627,17 +2767,17 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             // =============================================
             // INVESTMENTS FUNCTIONS
             // =============================================
-            
+
             function formatCurrency(value) {
                 return parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            
+
             function formatDate(dateStr) {
                 if (!dateStr) return '-';
                 const d = new Date(dateStr + 'T00:00:00');
                 return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
             }
-            
+
             function getInvestmentTypeEmoji(type) {
                 const emojis = {
                     'CDB': '💰', 'Tesouro': '🏛️', 'LCI/LCA': '🏠', 'Ações': '📊',
@@ -2645,32 +2785,32 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 };
                 return emojis[type] || '📦';
             }
-            
+
             function getPerformanceColor(perf) {
                 if (perf === 'excellent') return '#10b981';
                 if (perf === 'good') return '#3b82f6';
                 if (perf === 'below') return '#f59e0b';
                 return '#ef4444';
             }
-            
+
             async function loadInvestments() {
                 try {
                     const response = await fetch('/api/investments.php');
                     const data = await response.json();
-                    
+
                     if (data.status !== 'success') {
                         console.error('Error loading investments:', data.message);
                         return;
                     }
-                    
+
                     // Update summary
                     const summary = data.summary;
                     document.getElementById('inv-total-invested').textContent = 'R$ ' + formatCurrency(summary.total_invested);
                     document.getElementById('inv-total-current').textContent = 'R$ ' + formatCurrency(summary.total_current);
-                    
+
                     const gainEl = document.getElementById('inv-total-gain');
                     const yieldEl = document.getElementById('inv-total-yield');
-                    
+
                     if (summary.total_gain >= 0) {
                         gainEl.textContent = '+R$ ' + formatCurrency(summary.total_gain);
                         gainEl.style.color = 'var(--success)';
@@ -2682,10 +2822,10 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         yieldEl.textContent = formatCurrency(summary.total_yield) + '%';
                         yieldEl.style.color = 'var(--danger)';
                     }
-                    
+
                     // Render investment cards
                     const container = document.getElementById('investments-container');
-                    
+
                     if (data.investments.length === 0) {
                         container.innerHTML = `
                             <div style="color:var(--sub); font-size:14px; padding:40px; text-align:center; background:var(--card); border-radius:12px; grid-column: 1 / -1;">
@@ -2694,13 +2834,13 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         `;
                         return;
                     }
-                    
+
                     container.innerHTML = data.investments.map(inv => {
                         const perfColor = getPerformanceColor(inv.performance);
                         const emoji = getInvestmentTypeEmoji(inv.type);
                         const gainSign = parseFloat(inv.gain) >= 0 ? '+' : '';
                         const yieldSign = parseFloat(inv.yield_percent) >= 0 ? '+' : '';
-                        
+
                         return `
                             <div style="background:var(--card); border-radius:12px; padding:16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left:4px solid ${perfColor};">
                                 <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
@@ -2740,26 +2880,26 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             </div>
                         `;
                     }).join('');
-                    
+
                 } catch (e) {
                     console.error('Error loading investments:', e);
                 }
             }
-            
+
             // View investment history modal
             async function viewInvestmentHistory(id) {
                 try {
                     const response = await fetch(`/api/investments.php?id=${id}`);
                     const data = await response.json();
-                    
+
                     if (data.status !== 'success') {
                         alert('Erro ao carregar histórico');
                         return;
                     }
-                    
+
                     const inv = data.investment;
                     const transactions = inv.transactions || [];
-                    
+
                     let historyHtml = '';
                     if (transactions.length === 0) {
                         historyHtml = '<div style="text-align:center; color:var(--sub); padding:20px;">Nenhuma transação registrada</div>';
@@ -2769,7 +2909,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             let color = 'var(--sub)';
                             let label = 'Atualização';
                             let amountText = `R$ ${formatCurrency(t.balance_after)}`;
-                            
+
                             if (t.type === 'deposit') {
                                 icon = '💰';
                                 color = 'var(--success)';
@@ -2781,7 +2921,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                                 label = 'Retirada';
                                 amountText = `-R$ ${formatCurrency(t.amount)}`;
                             }
-                            
+
                             return `
                                 <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
                                     <div style="display:flex; align-items:center; gap:10px;">
@@ -2799,7 +2939,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             `;
                         }).join('');
                     }
-                    
+
                     // Show in a modal
                     const modalHtml = `
                         <div id="history-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:300; display:flex; align-items:center; justify-content:center;">
@@ -2827,15 +2967,15 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                             </div>
                         </div>
                     `;
-                    
+
                     document.body.insertAdjacentHTML('beforeend', modalHtml);
-                    
+
                 } catch (e) {
                     console.error('Error loading history:', e);
                     alert('Erro ao carregar histórico');
                 }
             }
-            
+
             // Deposit Modal
             function openDepositModal(id, name) {
                 document.getElementById('deposit-inv-id').value = id;
@@ -2844,21 +2984,21 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 document.getElementById('deposit-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('deposit-modal').style.display = 'flex';
             }
-            
+
             function closeDepositModal() {
                 document.getElementById('deposit-modal').style.display = 'none';
             }
-            
+
             async function saveDeposit(e) {
                 e.preventDefault();
-                
+
                 const data = {
                     action: 'deposit',
                     investment_id: document.getElementById('deposit-inv-id').value,
                     amount: document.getElementById('deposit-amount').value,
                     date: document.getElementById('deposit-date').value
                 };
-                
+
                 try {
                     const response = await fetch('/api/investments.php', {
                         method: 'POST',
@@ -2866,7 +3006,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         body: JSON.stringify(data)
                     });
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         closeDepositModal();
                         loadInvestments();
@@ -2877,22 +3017,22 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     alert('Erro ao registrar aporte');
                 }
             }
-            
+
             function openInvestmentModal() {
                 document.getElementById('investment-modal').style.display = 'flex';
                 document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
             }
-            
+
             function closeInvestmentModal() {
                 document.getElementById('investment-modal').style.display = 'none';
                 document.getElementById('inv-name').value = '';
                 document.getElementById('inv-amount').value = '';
                 document.getElementById('inv-rate').value = '';
             }
-            
+
             async function saveInvestment(e) {
                 e.preventDefault();
-                
+
                 const data = {
                     name: document.getElementById('inv-name').value,
                     type: document.getElementById('inv-type').value,
@@ -2901,7 +3041,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     expected_rate: document.getElementById('inv-rate').value || 0,
                     rate_period: document.getElementById('inv-rate-period').value
                 };
-                
+
                 try {
                     const response = await fetch('/api/investments.php', {
                         method: 'POST',
@@ -2909,7 +3049,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         body: JSON.stringify(data)
                     });
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         closeInvestmentModal();
                         loadInvestments();
@@ -2920,28 +3060,28 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     alert('Erro ao salvar investimento');
                 }
             }
-            
+
             function openUpdateModal(id, currentValue) {
                 document.getElementById('update-inv-id').value = id;
                 document.getElementById('update-new-value').value = currentValue;
                 document.getElementById('update-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('update-value-modal').style.display = 'flex';
             }
-            
+
             function closeUpdateModal() {
                 document.getElementById('update-value-modal').style.display = 'none';
             }
-            
+
             async function updateInvestmentValue(e) {
                 e.preventDefault();
-                
+
                 const data = {
                     action: 'update_value',
                     investment_id: document.getElementById('update-inv-id').value,
                     new_value: document.getElementById('update-new-value').value,
                     update_date: document.getElementById('update-date').value
                 };
-                
+
                 try {
                     const response = await fetch('/api/investments.php', {
                         method: 'POST',
@@ -2949,7 +3089,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         body: JSON.stringify(data)
                     });
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         closeUpdateModal();
                         loadInvestments();
@@ -2960,10 +3100,10 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                     alert('Erro ao atualizar valor');
                 }
             }
-            
+
             async function deleteInvestment(id) {
                 if (!confirm('Remover este investimento?')) return;
-                
+
                 try {
                     const response = await fetch('/api/investments.php', {
                         method: 'DELETE',
@@ -2971,7 +3111,7 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                         body: JSON.stringify({ id: id })
                     });
                     const result = await response.json();
-                    
+
                     if (result.status === 'success') {
                         loadInvestments();
                     } else {
@@ -2982,13 +3122,325 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
                 }
             }
 
+            // === CURRENCY FORMATTING ===
+            function formatCurrency(value) {
+                // Convert to number and format as Brazilian currency
+                const num = parseFloat(value) || 0;
+                return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // === RECURRING MODAL FUNCTIONS ===
+            function openRecurringModal() {
+                document.getElementById('recurring-modal').style.display = 'flex';
+                updateRecTypeVisual();
+            }
+
+            function closeRecurringModal() {
+                document.getElementById('recurring-modal').style.display = 'none';
+            }
+
+            function updateRecTypeVisual() {
+                const options = document.querySelectorAll('.rec-type-option');
+                options.forEach(opt => {
+                    const radio = opt.querySelector('input[type="radio"]');
+                    if (radio.checked) {
+                        if (radio.value === 'income') {
+                            opt.style.border = '2px solid var(--success)';
+                            opt.style.background = 'rgba(52, 199, 89, 0.1)';
+                        } else {
+                            opt.style.border = '2px solid var(--danger)';
+                            opt.style.background = 'rgba(255, 59, 48, 0.1)';
+                        }
+                    } else {
+                        opt.style.border = '2px solid var(--border)';
+                        opt.style.background = 'var(--card)';
+                    }
+                });
+            }
+
+            function formatRecCurrency(input) {
+                // Armazena posição do cursor
+                const cursorPos = input.selectionStart;
+                const oldLen = input.value.length;
+                // Remove tudo exceto números e vírgula
+                let value = input.value.replace(/[^\d,]/g, '');
+
+                // Separa parte inteira e decimal
+                const commaIndex = value.indexOf(',');
+                let intPart = commaIndex >= 0 ? value.substring(0, commaIndex) : value;
+                let decPart = commaIndex >= 0 ? value.substring(commaIndex + 1) : '';
+
+                // Remove zeros à esquerda (mas mantém pelo menos um dígito)
+                intPart = intPart.replace(/^0+/, '') || '0';
+
+                // Limita decimais a 2 dígitos
+                decPart = decPart.replace(/\D/g, '').substring(0, 2);
+
+                // Adiciona pontos de milhar na parte inteira
+                intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                // Reconstrói o valor
+                if (commaIndex >= 0) {
+                    value = intPart + ',' + decPart;
+                } else {
+                    value = intPart;
+                }
+
+                input.value = value;
+
+                // Restaura posição do cursor ajustada
+                const newLen = input.value.length;
+                const newPos = cursorPos + (newLen - oldLen);
+                input.setSelectionRange(newPos, newPos);
+            }
+
+            function parseRecCurrency(value) {
+                if (!value) return 0;
+                // Remove pontos (milhar) e troca vírgula por ponto (decimal)
+                let cleaned = value.replace(/\./g, '').replace(',', '.');
+                return parseFloat(cleaned) || 0;
+            }
+
+
+            async function saveRecurring(e) {
+                e.preventDefault();
+
+                const typeRadio = document.querySelector('input[name="rec-type"]:checked');
+                const type = typeRadio ? typeRadio.value : 'expense';
+                const description = document.getElementById('rec-description').value;
+                const amount = parseFloat(document.getElementById('rec-amount').value) || 0;
+                const category = document.getElementById('rec-category').value;
+                const frequency = document.getElementById('rec-frequency').value;
+                const lastDay = document.getElementById('rec-last-day').checked;
+                const day = lastDay ? -1 : parseInt(document.getElementById('rec-day').value);
+
+                if (amount <= 0) {
+                    alert('Por favor, insira um valor válido');
+                    return;
+                }
+
+                const data = {
+                    type: type,
+                    description: description,
+                    amount: amount,
+                    category: category,
+                    frequency: frequency,
+                    day_of_month: day,
+                    active: true
+                };
+
+                try {
+                    const response = await fetch('/api/recurring.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        closeRecurringModal();
+                        loadRecurring();
+                        // Clear form
+                        document.getElementById('rec-description').value = '';
+                        document.getElementById('rec-amount').value = '';
+                    } else {
+                        alert('Erro: ' + result.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Erro ao salvar recorrência');
+                }
+            }
+
+            // Load recurring transactions
+            async function loadRecurring() {
+                const container = document.getElementById('recurring-container');
+
+                try {
+                    const response = await fetch('/api/recurring.php');
+                    const data = await response.json();
+
+                    if (data.status !== 'success') {
+                        container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">Erro ao carregar</div>';
+                        return;
+                    }
+
+                    const recurring = data.recurring || [];
+
+                    if (recurring.length === 0) {
+                        container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px; background:var(--card); border-radius:12px;">Nenhuma recorrência cadastrada. Clique em "+ Nova Recorrência" para adicionar.</div>';
+                        return;
+                    }
+
+                    const frequencyLabels = {
+                        'monthly': 'Mensal',
+                        'weekly': 'Semanal',
+                        'yearly': 'Anual'
+                    };
+
+                    container.innerHTML = recurring.map(r => {
+                        const isIncome = r.type === 'income';
+                        const icon = isIncome ? '💰' : '💸';
+                        const color = isIncome ? 'var(--success)' : 'var(--danger)';
+                        const dayLabel = r.day_of_month == -1 ? 'Último dia' : `Dia ${r.day_of_month}`;
+                        const escapedDesc = (r.description || '').replace(/'/g, "\\'");
+
+                        return `
+                            <div style="background:var(--card); border-radius:12px; padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div style="font-size:24px;">${icon}</div>
+                                    <div>
+                                        <div style="font-weight:600; color:var(--text);">${r.description}</div>
+                                        <div style="font-size:12px; color:var(--sub);">${r.category} • ${frequencyLabels[r.frequency] || r.frequency} • ${dayLabel}</div>
+                                    </div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <div style="font-weight:700; color:${color}; margin-right:8px;">R$ ${formatCurrency(r.amount)}</div>
+                                    <button onclick="openEditRecurringModal(${r.id}, '${r.type}', '${escapedDesc}', ${r.amount}, '${r.category}', '${r.frequency}', ${r.day_of_month})" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:14px;" title="Editar">✏️</button>
+                                    <button onclick="deleteRecurring(${r.id})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:14px;" title="Remover">🗑️</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">Erro ao carregar recorrências</div>';
+                }
+            }
+
+            // Delete recurring transaction
+            async function deleteRecurring(id) {
+                if (!confirm('Remover esta recorrência?')) return;
+
+                try {
+                    const response = await fetch('/api/recurring.php', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: id })
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        loadRecurring();
+                    } else {
+                        alert('Erro: ' + result.message);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Erro ao remover recorrência');
+                }
+            }
+
+            // Edit recurring - open modal
+            function openEditRecurringModal(id, type, description, amount, category, frequency, dayOfMonth) {
+                document.getElementById('edit-rec-id').value = id;
+                document.getElementById('edit-rec-description').value = description;
+                document.getElementById('edit-rec-amount').value = amount;
+                document.getElementById('edit-rec-category').value = category;
+                document.getElementById('edit-rec-frequency').value = frequency;
+
+                // Set type radio
+                const radios = document.querySelectorAll('input[name="edit-rec-type"]');
+                radios.forEach(r => r.checked = r.value === type);
+
+                // Set day
+                if (dayOfMonth == -1) {
+                    document.getElementById('edit-rec-last-day').checked = true;
+                    document.getElementById('edit-rec-day').disabled = true;
+                    document.getElementById('edit-rec-day').value = 1;
+                } else {
+                    document.getElementById('edit-rec-last-day').checked = false;
+                    document.getElementById('edit-rec-day').disabled = false;
+                    document.getElementById('edit-rec-day').value = dayOfMonth;
+                }
+
+                updateEditRecTypeVisual();
+                document.getElementById('edit-recurring-modal').style.display = 'flex';
+            }
+
+            function closeEditRecurringModal() {
+                document.getElementById('edit-recurring-modal').style.display = 'none';
+            }
+
+            function updateEditRecTypeVisual() {
+                const options = document.querySelectorAll('.edit-rec-type-option');
+                options.forEach(opt => {
+                    const radio = opt.querySelector('input[type="radio"]');
+                    if (radio.checked) {
+                        if (radio.value === 'income') {
+                            opt.style.border = '2px solid var(--success)';
+                            opt.style.background = 'rgba(52, 199, 89, 0.1)';
+                        } else {
+                            opt.style.border = '2px solid var(--danger)';
+                            opt.style.background = 'rgba(255, 59, 48, 0.1)';
+                        }
+                    } else {
+                        opt.style.border = '2px solid var(--border)';
+                        opt.style.background = 'var(--card)';
+                    }
+                });
+            }
+
+            async function updateRecurring(e) {
+                e.preventDefault();
+
+                const id = document.getElementById('edit-rec-id').value;
+                const typeRadio = document.querySelector('input[name="edit-rec-type"]:checked');
+                const type = typeRadio ? typeRadio.value : 'expense';
+                const description = document.getElementById('edit-rec-description').value;
+                const amount = parseFloat(document.getElementById('edit-rec-amount').value) || 0;
+                const category = document.getElementById('edit-rec-category').value;
+                const frequency = document.getElementById('edit-rec-frequency').value;
+                const lastDay = document.getElementById('edit-rec-last-day').checked;
+                const day = lastDay ? -1 : parseInt(document.getElementById('edit-rec-day').value);
+
+                if (amount <= 0) {
+                    alert('Por favor, insira um valor válido');
+                    return;
+                }
+
+                const data = {
+                    id: parseInt(id),
+                    type: type,
+                    description: description,
+                    amount: amount,
+                    category: category,
+                    frequency: frequency,
+                    day_of_month: day
+                };
+
+                try {
+                    const response = await fetch('/api/recurring.php', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        closeEditRecurringModal();
+                        loadRecurring();
+                    } else {
+                        alert('Erro: ' + result.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Erro ao atualizar recorrência');
+                }
+            }
+
             // Initial Load & Event Listeners
             document.addEventListener('DOMContentLoaded', () => {
                 // Load Transactions
                 filterTransactions();
-                
+
                 // Load Investments
                 loadInvestments();
+
+                // Load Recurring
+                loadRecurring();
 
                 // Chat Input Enter Key
                 const chatInput = document.getElementById('chat-input');
@@ -3000,38 +3452,50 @@ $current_balance = ($initial_balance + $total_income) - $total_expenses;
             });
 
         </script>
-<!-- Chat Modal -->
-<div id="ai-chat-modal" style="display:none; position:fixed; bottom:20px; right:20px; width:400px; height:600px; background:var(--card); border-radius:16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index:1000; flex-direction:column; border:1px solid var(--border); overflow:hidden;">
-    <div style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--sidebar-bg); color:white;">
-        <div style="font-weight:600; display:flex; align-items:center; gap:8px;"><i data-lucide="bot" width="18"></i> Lume AI</div>
-        <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
-    </div>
-    <div id="chat-messages" style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:16px; background:var(--main-bg);">
-        <div style="display:flex; gap:10px; margin-bottom:12px;">
-            <div style="width:28px; height:28px; background:#10a37f; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white;"><i data-lucide="bot" width="16"></i></div>
-            <div style="background:transparent; padding:0; border-radius:8px; font-size:14px; line-height:1.5; color:var(--text); flex:1;">
-                Olá! Clique em <strong>Análise Inteligente</strong> para gerar um relatório do seu mês. 🚀
+        <!-- Chat Modal -->
+        <div id="ai-chat-modal"
+            style="display:none; position:fixed; bottom:20px; right:20px; width:400px; height:600px; background:var(--card); border-radius:16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index:1000; flex-direction:column; border:1px solid var(--border); overflow:hidden;">
+            <div
+                style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--sidebar-bg); color:white;">
+                <div style="font-weight:600; display:flex; align-items:center; gap:8px;"><i data-lucide="bot"
+                        width="18"></i> Lume AI</div>
+                <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;"><i
+                        data-lucide="x"></i></button>
+            </div>
+            <div id="chat-messages"
+                style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:16px; background:var(--main-bg);">
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    <div
+                        style="width:28px; height:28px; background:#10a37f; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white;">
+                        <i data-lucide="bot" width="16"></i>
+                    </div>
+                    <div
+                        style="background:transparent; padding:0; border-radius:8px; font-size:14px; line-height:1.5; color:var(--text); flex:1;">
+                        Olá! Clique em <strong>Análise Inteligente</strong> para gerar um relatório do seu mês. 🚀
+                    </div>
+                </div>
+            </div>
+            <div style="padding:16px; border-top:1px solid var(--border); background:var(--bg);">
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="chat-input" placeholder="Digite algo..."
+                        style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); outline:none;">
+                    <button onclick="sendChatMessage()"
+                        style="background:var(--accent); color:white; border:none; width:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i
+                            data-lucide="send" width="16"></i></button>
+                </div>
             </div>
         </div>
-    </div>
-    <div style="padding:16px; border-top:1px solid var(--border); background:var(--bg);">
-        <div style="display:flex; gap:8px;">
-            <input type="text" id="chat-input" placeholder="Digite algo..." style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); outline:none;">
-            <button onclick="sendChatMessage()" style="background:var(--accent); color:white; border:none; width:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i data-lucide="send" width="16"></i></button>
-        </div>
-    </div>
-</div>
 
-<!-- Service Worker Registration -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('SW registered:', reg.scope))
-                .catch(err => console.log('SW registration failed:', err));
-        });
-    }
-</script>
+        <!-- Service Worker Registration -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(reg => console.log('SW registered:', reg.scope))
+                        .catch(err => console.log('SW registration failed:', err));
+                });
+            }
+        </script>
 
 </body>
 
