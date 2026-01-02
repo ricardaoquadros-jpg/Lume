@@ -1,0 +1,196 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== MODELS ====================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  avatarUrl     String?
+  passwordHash  String?
+  emailVerified DateTime?
+  
+  // Relations
+  subscription  Subscription?
+  workProfile   WorkProfile?
+  transactions  Transaction[]
+  investments   Investment[]
+  recurring     RecurringTransaction[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  plan      Plan     @default(FREE)
+  status    SubscriptionStatus @default(ACTIVE)
+  
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  stripePriceId       String?
+  
+  currentPeriodStart  DateTime?
+  currentPeriodEnd    DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Plan {
+  FREE
+  PRO
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+model WorkProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  salary          Decimal  @db.Decimal(10, 2)
+  paymentType     String   @default("monthly") // monthly, biweekly, weekly
+  workDays        Json?    // Array of weekdays [1,2,3,4,5]
+  workStart       String?  // "09:00"
+  workEnd         String?  // "18:00"
+  hasInterval     Boolean  @default(false)
+  intervalStart   String?
+  intervalEnd     String?
+  
+  initialBalance  Decimal  @default(0) @db.Decimal(10, 2)
+  lastConfiguredMonth String?
+  
+  aiProfileData   Json?    // For AI assistant context
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type            TransactionType
+  description     String
+  amount          Decimal  @db.Decimal(10, 2)
+  category        String   @default("Outros")
+  
+  transactionDate DateTime @default(now())
+  transcription   String?  // For voice input
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId, transactionDate])
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+model RecurringTransaction {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type          TransactionType
+  description   String
+  amount        Decimal  @db.Decimal(10, 2)
+  category      String   @default("Outros")
+  frequency     Frequency @default(monthly)
+  dayOfMonth    Int      @default(1) // -1 for last day
+  
+  active        Boolean  @default(true)
+  lastExecuted  DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, active])
+}
+
+enum Frequency {
+  daily
+  weekly
+  monthly
+  yearly
+}
+
+model Investment {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name          String
+  type          InvestmentType
+  currentValue  Decimal  @db.Decimal(12, 2)
+  active        Boolean  @default(true)
+  
+  expectedRate  Decimal? @db.Decimal(5, 2) // Annual rate %
+  ratePeriod    String?  // "annual", "monthly"
+  
+  lastUpdate    DateTime @default(now())
+  
+  transactions  InvestmentTransaction[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, active])
+}
+
+enum InvestmentType {
+  CDB
+  Tesouro
+  LCI_LCA
+  Acoes
+  FIIs
+  Crypto
+  Poupanca
+  Outro
+}
+
+model InvestmentTransaction {
+  id            String   @id @default(cuid())
+  investmentId  String
+  investment    Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  
+  type          InvestmentTransactionType
+  amount        Decimal  @db.Decimal(12, 2)
+  balanceAfter  Decimal  @db.Decimal(12, 2)
+  
+  transactionDate DateTime @default(now())
+  notes         String?
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([investmentId, transactionDate])
+}
+
+enum InvestmentTransactionType {
+  deposit
+  withdrawal
+  update
+}

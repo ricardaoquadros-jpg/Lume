@@ -21,6 +21,10 @@ error_log
 vendor/
 composer.lock
 
+# Node.js
+node_modules/
+.next/
+
 # Temporary files
 *.tmp
 *.temp
