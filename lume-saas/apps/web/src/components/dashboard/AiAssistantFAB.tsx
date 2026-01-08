@@ -150,20 +150,24 @@ export function AiAssistantFAB() {
     };
 
     return (
-        <div className="fixed bottom-8 left-8 z-[100]">
+        <>
+            {/* Draggable Chat Popup */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20, originX: 0, originY: 1 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="absolute bottom-16 left-0 w-[350px] md:w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-[500px]"
+                        drag
+                        dragMomentum={false}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-[500px] z-[200] cursor-move"
                     >
-                        {/* Header */}
-                        <div className="bg-[#0b3680] p-4 flex items-center justify-between text-white">
+                        {/* Header - Drag Handle */}
+                        <div className="bg-[#0b3680] p-4 flex items-center justify-between text-white cursor-grab active:cursor-grabbing">
                             <div className="flex items-center gap-2">
                                 <Bot className="w-5 h-5" />
                                 <span className="font-semibold text-sm">Assistente Lume</span>
+                                <span className="text-[10px] text-blue-200 ml-1">• arraste para mover</span>
                             </div>
                             <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1 rounded-lg transition-colors">
                                 <X className="w-4 h-4" />
@@ -171,7 +175,7 @@ export function AiAssistantFAB() {
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 cursor-default">
                             {messages.map((msg, idx) => (
                                 <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                     <div className={`
@@ -213,7 +217,7 @@ export function AiAssistantFAB() {
                         </div>
 
                         {/* Input */}
-                        <div className="p-3 bg-white border-t border-gray-100 flex gap-2">
+                        <div className="p-3 bg-white border-t border-gray-100 flex gap-2 cursor-default">
                             <input
                                 type="text"
                                 placeholder="Digite seu comando..."
@@ -234,14 +238,18 @@ export function AiAssistantFAB() {
                 )}
             </AnimatePresence>
 
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-14 h-14 bg-[#0b3680] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#092a66] transition-colors"
-            >
-                {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}
-            </motion.button>
-        </div>
+            {/* Smaller FAB Button */}
+            <div className="fixed bottom-28 right-8 z-[100]">
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="w-11 h-11 bg-[#0b3680] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#092a66] transition-colors"
+                >
+                    {isOpen ? <X className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                </motion.button>
+            </div>
+        </>
     );
 }
+

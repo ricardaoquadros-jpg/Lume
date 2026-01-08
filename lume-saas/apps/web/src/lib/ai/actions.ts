@@ -17,7 +17,7 @@ export async function performAIAction(functionName: string, args: any, transcrip
                 description: args.description,
                 category: args.category || "Outros",
                 transaction_date: args.date || new Date().toISOString().split("T")[0],
-                // transcription: transcription || null // Disabled until migration is applied
+                transcription: transcription || null
             });
             if (txResult.error) {
                 console.error("[AI Action] DB Error:", txResult.error);

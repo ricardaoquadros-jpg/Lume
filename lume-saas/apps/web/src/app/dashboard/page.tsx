@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { TopExpenses } from "@/components/dashboard/TopExpenses";
 import { BalanceChart } from "@/components/dashboard/BalanceChart";
+import { DataBackup } from "@/components/dashboard/DataBackup";
 
 type WorkProfile = {
     salary: number;
@@ -326,7 +327,9 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                    <DataBackup />
+
                     <button
                         onClick={() => {
                             window.dispatchEvent(new CustomEvent("trigger-ai-analysis", {

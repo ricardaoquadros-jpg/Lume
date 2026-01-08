@@ -6,7 +6,7 @@ import { AddTransactionModal } from "@/components/dashboard/AddTransactionModal"
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Plus, Search, Filter, ArrowUpRight, ArrowDownRight,
-    Loader2, Trash2, Pencil, Calendar, Tag, ChevronLeft, ChevronRight, RefreshCw, MessageSquare
+    Loader2, Trash2, Pencil, Calendar, Tag, ChevronLeft, ChevronRight, RefreshCw, Mic, ChevronUp, ChevronDown
 } from "lucide-react";
 
 type Transaction = {
@@ -17,6 +17,8 @@ type Transaction = {
     category: string;
     transaction_date: string;
     transcription?: string;
+    display_order?: number;
+    running_balance?: number; // Calculated field for display
 };
 
 export default function TransacoesPage() {
@@ -101,14 +103,32 @@ export default function TransacoesPage() {
                 allTransactions.push(initialTx);
             }
 
-            // Sort by date descending, but keep initial_balance at the very bottom
+            // Sort by date descending, then by display_order ascending within the same date
             allTransactions.sort((a, b) => {
                 if (a.id === "initial_balance") return 1;
                 if (b.id === "initial_balance") return -1;
                 const dateA = new Date(a.transaction_date).getTime();
                 const dateB = new Date(b.transaction_date).getTime();
-                return dateB - dateA;
+                if (dateB !== dateA) return dateB - dateA;
+                // Same date: sort by display_order ascending
+                return (a.display_order || 0) - (b.display_order || 0);
             });
+
+            // Calculate running balance (from oldest to newest)
+            const sortedForBalance = [...allTransactions].reverse();
+            let cumulativeBalance = 0;
+            const balanceMap = new Map<string, number>();
+            sortedForBalance.forEach(t => {
+                if (t.type === "income") cumulativeBalance += Number(t.amount);
+                else cumulativeBalance -= Number(t.amount);
+                balanceMap.set(t.id, cumulativeBalance);
+            });
+
+            // Assign running_balance to each transaction
+            allTransactions = allTransactions.map(t => ({
+                ...t,
+                running_balance: balanceMap.get(t.id) || 0
+            }));
 
             setTransactions(allTransactions);
 
@@ -165,6 +185,45 @@ export default function TransacoesPage() {
             setRefreshTrigger(prev => prev + 1);
         }
     };
+
+    // Helper to get transactions on the same date
+    const getSameDayTransactions = (txDate: string) => {
+        return transactions.filter(t => t.transaction_date === txDate && t.id !== "initial_balance");
+    };
+
+    // Handle reordering transactions within the same day
+    const handleReorder = async (transaction: Transaction, direction: "up" | "down") => {
+        const sameDayTxs = getSameDayTransactions(transaction.transaction_date);
+        if (sameDayTxs.length < 2) return;
+
+        // Sort by display_order, then by id as tiebreaker for consistent ordering
+        sameDayTxs.sort((a, b) => {
+            const orderDiff = (a.display_order || 0) - (b.display_order || 0);
+            if (orderDiff !== 0) return orderDiff;
+            return a.id.localeCompare(b.id); // Stable tiebreaker
+        });
+
+        const currentIndex = sameDayTxs.findIndex(t => t.id === transaction.id);
+        const swapIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+        if (swapIndex < 0 || swapIndex >= sameDayTxs.length) return;
+
+        // Normalize: assign sequential display_order to all same-day transactions
+        const updates: Promise<any>[] = [];
+        sameDayTxs.forEach((tx, idx) => {
+            // Swap positions for current and swap transactions
+            let newOrder = idx;
+            if (idx === currentIndex) newOrder = swapIndex;
+            else if (idx === swapIndex) newOrder = currentIndex;
+
+            updates.push(
+                supabase.from("transactions").update({ display_order: newOrder }).eq("id", tx.id)
+            );
+        });
+
+        await Promise.all(updates);
+        setRefreshTrigger(prev => prev + 1);
+    };
+
 
     const formatCurrency = (value: number) => {
         return value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -310,10 +369,11 @@ export default function TransacoesPage() {
                 {/* Table Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-[12px] font-semibold text-gray-500 uppercase tracking-[0.5px]">
                     <div className="col-span-1">Tipo</div>
-                    <div className="col-span-4">Descrição</div>
+                    <div className="col-span-3">Descrição</div>
                     <div className="col-span-2">Categoria</div>
                     <div className="col-span-2">Data</div>
                     <div className="col-span-2 text-right">Valor</div>
+                    <div className="col-span-1 text-right">Saldo</div>
                     <div className="col-span-1 text-right">Ação</div>
                 </div>
 
@@ -344,7 +404,7 @@ export default function TransacoesPage() {
                                                         {transaction.type === "income" ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
                                                     </div>
                                                 </div>
-                                                <div className="col-span-4">
+                                                <div className="col-span-3">
                                                     <p className="text-[14px] font-semibold text-gray-900 truncate">{transaction.description}</p>
                                                 </div>
                                                 <div className="col-span-2">
@@ -361,14 +421,37 @@ export default function TransacoesPage() {
                                                         {transaction.type === "income" ? "+" : "-"} R$ {formatCurrency(Number(transaction.amount))}
                                                     </span>
                                                 </div>
+                                                <div className="col-span-1 text-right">
+                                                    <span className={`text-[13px] font-semibold ${(transaction.running_balance || 0) >= 0 ? "text-gray-700" : "text-red-500"}`}>
+                                                        R$ {formatCurrency(transaction.running_balance || 0)}
+                                                    </span>
+                                                </div>
                                                 <div className="col-span-1 text-right flex items-center justify-end gap-1">
+                                                    {transaction.id !== "initial_balance" && getSameDayTransactions(transaction.transaction_date).length > 1 && (
+                                                        <div className="flex flex-col gap-0.5 mr-2">
+                                                            <button
+                                                                onClick={() => handleReorder(transaction, "up")}
+                                                                className="p-0.5 rounded hover:bg-gray-100 text-gray-400 hover:text-[#0b3680] transition-colors"
+                                                                title="Mover para cima"
+                                                            >
+                                                                <ChevronUp className="w-3.5 h-3.5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleReorder(transaction, "down")}
+                                                                className="p-0.5 rounded hover:bg-gray-100 text-gray-400 hover:text-[#0b3680] transition-colors"
+                                                                title="Mover para baixo"
+                                                            >
+                                                                <ChevronDown className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                     {transaction.transcription && (
                                                         <button
                                                             onClick={() => setExpandedTranscriptionId(expandedTranscriptionId === transaction.id ? null : transaction.id)}
                                                             className={`p-2 rounded-lg transition-colors ${expandedTranscriptionId === transaction.id ? "bg-indigo-100 text-indigo-600" : "hover:bg-indigo-50 text-gray-400 hover:text-indigo-500"}`}
                                                             title="Ver transcrição"
                                                         >
-                                                            <MessageSquare className="w-4 h-4" />
+                                                            <Mic className="w-4 h-4" />
                                                         </button>
                                                     )}
                                                     {transaction.id !== "initial_balance" && (
@@ -400,7 +483,7 @@ export default function TransacoesPage() {
                                                         className="overflow-hidden bg-indigo-50/50 border-t border-indigo-100"
                                                     >
                                                         <div className="px-6 py-3 flex items-start gap-3">
-                                                            <MessageSquare className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                                                            <Mic className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
                                                             <div>
                                                                 <p className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider mb-0.5">Comando de Voz Original</p>
                                                                 <p className="text-sm text-indigo-700 italic">"{transaction.transcription}"</p>
