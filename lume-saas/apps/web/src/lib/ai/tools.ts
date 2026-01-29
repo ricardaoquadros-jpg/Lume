@@ -125,5 +125,23 @@ export const tools = [
                 required: ["investment_name", "current_value"]
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_transactions",
+            description: "Buscar transações financeiras filtradas por data, categoria, tipo ou descrição. Use isso quando o usuário perguntar 'quanto gastei em tal data', 'gastos com uber', etc.",
+            parameters: {
+                type: "object",
+                properties: {
+                    start_date: { type: "string", description: "Data inicial (YYYY-MM-DD)" },
+                    end_date: { type: "string", description: "Data final (YYYY-MM-DD)" },
+                    category: { type: "string" },
+                    type: { type: "string", enum: ["income", "expense"] },
+                    search_term: { type: "string", description: "Termo de busca (ex: 'Uber', 'Mercado')" },
+                    limit: { type: "number", description: "Limite de resultados (padrão 20)" }
+                }
+            }
+        }
     }
 ];

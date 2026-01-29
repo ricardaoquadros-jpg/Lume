@@ -154,6 +154,35 @@ export async function performAIAction(functionName: string, args: any, transcrip
                 })
                 .eq("id", invToUpdate[0].id);
 
+        case "get_transactions":
+            let query = supabase
+                .from("transactions")
+                .select("*")
+                .eq("user_id", user.id)
+                .order("transaction_date", { ascending: false });
+
+            if (args.start_date) query = query.gte("transaction_date", args.start_date);
+            if (args.end_date) query = query.lte("transaction_date", args.end_date);
+            if (args.type) query = query.eq("type", args.type);
+            if (args.category) query = query.eq("category", args.category);
+
+            if (args.search_term) {
+                query = query.ilike("description", `%${args.search_term}%`);
+            }
+
+            const limit = args.limit || 20;
+            query = query.limit(limit);
+
+            const { data: searchResults, error: searchError } = await query;
+
+            if (searchError) throw new Error("Erro na busca: " + searchError.message);
+
+            return {
+                action: "get_transactions",
+                data: searchResults,
+                count: searchResults?.length || 0
+            };
+
         default:
             throw new Error("Função desconhecida");
     }

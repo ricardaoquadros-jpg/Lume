@@ -90,10 +90,18 @@ export function AiAssistantFAB() {
         setIsTyping(true);
 
         try {
+            const recentMessages = messages.slice(-6).map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+
             const response = await fetch("/api/ai/process", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: userMsg }),
+                body: JSON.stringify({
+                    text: userMsg,
+                    history: recentMessages
+                }),
             });
 
             const data = await response.json();

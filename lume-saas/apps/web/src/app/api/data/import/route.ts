@@ -35,6 +35,11 @@ export async function POST(request: NextRequest) {
             delete profileData.updated_at;
             profileData.user_id = user.id;
 
+            // If ai_profile_data is an object (from our clean export), stringify it for storage if DB expects string/jsonb
+            if (typeof profileData.ai_profile_data === 'object' && profileData.ai_profile_data !== null) {
+                profileData.ai_profile_data = JSON.stringify(profileData.ai_profile_data);
+            }
+
             await supabase.from('work_profiles').upsert(profileData, {
                 onConflict: 'user_id'
             });
@@ -100,7 +105,9 @@ export async function POST(request: NextRequest) {
             imported: {
                 transactions: data.transactions?.length || 0,
                 recurring: data.recurring_transactions?.length || 0,
-                investments: data.investments?.length || 0
+                investments: data.investments?.length || 0,
+                contributions: data.investment_contributions?.length || 0,
+                profile_restored: !!data.work_profile
             }
         });
 

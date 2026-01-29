@@ -29,7 +29,13 @@ export async function GET() {
             version: '1.0',
             exported_at: new Date().toISOString(),
             data: {
-                work_profile: work_profile || null,
+                work_profile: work_profile ? {
+                    ...work_profile,
+                    // Parse AI data if it is a string to insure clean JSON export
+                    ai_profile_data: typeof work_profile.ai_profile_data === 'string' 
+                        ? JSON.parse(work_profile.ai_profile_data) 
+                        : work_profile.ai_profile_data
+                } : null,
                 transactions: transactions || [],
                 recurring_transactions: recurring_transactions || [],
                 investments: investments || [],

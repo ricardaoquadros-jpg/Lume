@@ -43,6 +43,15 @@ export async function POST(req: NextRequest) {
                 });
             }
             userText = body.text;
+
+            // Extract history if available
+            if (body.history && Array.isArray(body.history)) {
+                // The history comes from frontend, sanitize roles
+                (req as any).history = body.history.map((h: any) => ({
+                    role: (h.role === "user" || h.role === "assistant") ? h.role : "user",
+                    content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
+                }));
+            }
         } else if (contentType.includes("multipart/form-data")) {
             const formData = await req.formData();
             const file = formData.get("audio") as File;
@@ -205,12 +214,17 @@ O campo "date" é OBRIGATÓRIO em toda chamada de add_transaction.
         }
 
         // 3. AI Processing
+        const history = (req as any).history || [];
+
+        const messagesPayload = [
+            { role: "system", content: systemPrompt },
+            ...history,
+            { role: "user", content: userText }
+        ];
+
         const completion = await groq.chat.completions.create({
             model: "llama-3.3-70b-versatile", // RESTORED SMART MODEL
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userText }
-            ],
+            messages: messagesPayload as any,
             tools: tools as any,
             tool_choice: "auto",
             max_tokens: 4096, // Ensure enough space for bulk tool calls
@@ -231,6 +245,8 @@ O campo "date" é OBRIGATÓRIO em toda chamada de add_transaction.
         let finalMessage = "";
 
         if (toolCalls) {
+            const toolResults = [];
+
             for (const toolCall of toolCalls) {
                 const functionName = (toolCall as any).function.name;
                 const functionArgs = JSON.parse((toolCall as any).function.arguments);
@@ -239,17 +255,55 @@ O campo "date" é OBRIGATÓRIO em toda chamada de add_transaction.
                 if (SENSITIVE_ACTIONS.includes(functionName)) {
                     console.log(`[AI API] Sensitive action detected: ${functionName}`);
                     confirmationRequired = true;
-                    pendingAction = { functionName, args: functionArgs, transcription: userText }; // Store transcription
+                    pendingAction = { functionName, args: functionArgs, transcription: userText };
                     break;
                 }
 
                 console.log(`[AI API] Executing safe action: ${functionName}`);
-                await performAIAction(functionName, functionArgs, userText);
+                const result = await performAIAction(functionName, functionArgs, userText);
+
+                toolResults.push({
+                    toolCallId: toolCall.id,
+                    functionName: functionName,
+                    result: result
+                });
+
                 results.push({ action: functionName, status: "success" });
             }
-            finalMessage = results.length > 0
-                ? `✅ ${results.length} ação(ões) executada(s) com sucesso.`
-                : (message.content || "Comando processado.");
+
+            // CHECK IF WE NEED A SECOND ROUND (For Get/Search tools)
+            const hasDataRetrieval = toolResults.some(r => r.functionName.startsWith("get_"));
+
+            if (hasDataRetrieval && !confirmationRequired) {
+                console.log("[AI API] Data retrieved, running second LLM pass...");
+
+                const secondRoundMessages = [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userText },
+                    { role: "assistant", content: null, tool_calls: toolCalls },
+                    ...toolResults.map(r => ({
+                        role: "tool",
+                        tool_call_id: r.toolCallId || "call_" + Math.random().toString(36).substring(7),
+                        name: r.functionName,
+                        content: JSON.stringify(r.result) // Inject the search results back
+                    }))
+                ];
+
+                const secondCompletion = await groq.chat.completions.create({
+                    model: "llama-3.3-70b-versatile",
+                    messages: secondRoundMessages as any,
+                    // We don't necessarily need tools in the second round if it's just meant to answer, 
+                    // but keeping them doesn't hurt. Llama might try to loop, so maybe safer to omit tools for now to force a text reply.
+                    // tools: tools as any, 
+                });
+
+                finalMessage = secondCompletion.choices[0].message.content || "Análise concluída com base nos dados.";
+            } else {
+                finalMessage = results.length > 0
+                    ? `✅ ${results.length} ação(ões) executada(s) com sucesso.`
+                    : (message.content || "Comando processado.");
+            }
+
         } else {
             // Try to parse content as JSON if model followed instructions, else use as raw text
             try {
