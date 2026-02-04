@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Launcher for Lume SaaS",
     "scripts": {
-        "dev": "npm run dev --prefix lume-saas",
+        "dev": "powershell -ExecutionPolicy Bypass -Command \"npm run dev --prefix lume-saas\"",
         "install:all": "npm install --prefix lume-saas",
         "build": "npm run build --prefix lume-saas",
         "start": "npm run start --prefix lume-saas"

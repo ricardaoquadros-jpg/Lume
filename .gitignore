@@ -46,4 +46,6 @@ n8n_credentials.json
 htdocs/
 download.zip
 download_extracted/
-Lume.zip
+
+# Turbo
+.turbo/
