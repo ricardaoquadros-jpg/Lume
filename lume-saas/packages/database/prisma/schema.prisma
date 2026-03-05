@@ -189,8 +189,33 @@ model InvestmentTransaction {
   @@index([investmentId, transactionDate])
 }
 
+
 enum InvestmentTransactionType {
   deposit
   withdrawal
   update
+}
+
+
+model CalendarEvent {
+  id            String            @id @default(cuid())
+  userId        String            @map("user_id")
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date          DateTime          @db.Date
+  type          CalendarEventType
+  
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+  
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("calendar_events")
+}
+
+enum CalendarEventType {
+  WORK
+  VACATION
+  HOLIDAY
+  @@map("calendar_event_type")
 }

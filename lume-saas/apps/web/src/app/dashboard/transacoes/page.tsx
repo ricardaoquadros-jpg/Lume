@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AddTransactionModal } from "@/components/dashboard/AddTransactionModal";
+import { ImportStatementModal } from "@/components/dashboard/ImportStatementModal";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Plus, Search, Filter, ArrowUpRight, ArrowDownRight,
-    Loader2, Trash2, Pencil, Calendar, Tag, ChevronLeft, ChevronRight, RefreshCw, Mic, ChevronUp, ChevronDown
+    Loader2, Trash2, Pencil, Calendar, Tag, ChevronLeft, ChevronRight, RefreshCw, Mic, ChevronUp, ChevronDown, Upload
 } from "lucide-react";
 
 type Transaction = {
@@ -28,6 +29,7 @@ export default function TransacoesPage() {
     const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
     const [expandedTranscriptionId, setExpandedTranscriptionId] = useState<string | null>(null);
@@ -287,6 +289,13 @@ export default function TransacoesPage() {
                         <RefreshCw className="w-5 h-5" />
                     </button>
                     <button
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-5 py-3 rounded-xl font-semibold text-[14px] hover:bg-gray-50 hover:text-[#0b3680] transition-all shadow-sm"
+                    >
+                        <Upload className="w-5 h-5" />
+                        Importar Extrato
+                    </button>
+                    <button
                         onClick={() => setIsAddModalOpen(true)}
                         className="flex items-center gap-2 bg-[#0b3680] text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#092a66] transition-all shadow-lg shadow-[#0b3680]/20"
                     >
@@ -531,16 +540,24 @@ export default function TransacoesPage() {
 
             {/* Add/Edit Modal */}
             {userId && (
-                <AddTransactionModal
-                    userId={userId}
-                    isOpen={isAddModalOpen}
-                    onClose={() => {
-                        setIsAddModalOpen(false);
-                        setEditingTransaction(null);
-                    }}
-                    onSuccess={() => setRefreshTrigger(prev => prev + 1)}
-                    initialData={editingTransaction}
-                />
+                <>
+                    <AddTransactionModal
+                        userId={userId}
+                        isOpen={isAddModalOpen}
+                        onClose={() => {
+                            setIsAddModalOpen(false);
+                            setEditingTransaction(null);
+                        }}
+                        onSuccess={() => setRefreshTrigger(prev => prev + 1)}
+                        initialData={editingTransaction}
+                    />
+                    <ImportStatementModal
+                        userId={userId}
+                        isOpen={isImportModalOpen}
+                        onClose={() => setIsImportModalOpen(false)}
+                        onSuccess={() => setRefreshTrigger(prev => prev + 1)}
+                    />
+                </>
             )}
         </div>
     );

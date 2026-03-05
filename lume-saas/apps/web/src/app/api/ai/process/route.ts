@@ -4,13 +4,20 @@ import { tools } from "@/lib/ai/tools";
 import { performAIAction } from "@/lib/ai/actions";
 import { createClient } from "@/lib/supabase/server";
 
-// KEYS (Hardcoded for immediate fix)
-const GROQ_KEY = "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";
+// API Keys
+const GROQ_KEY = "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"; // Keep for Whisper transcription
+const OPENROUTER_KEY = "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";
 
-// Initialize Groq Client
+// Initialize Groq Client (for Whisper transcription only)
 const groq = new OpenAI({
     apiKey: GROQ_KEY,
     baseURL: "https://api.groq.com/openai/v1"
+});
+
+// Initialize OpenRouter Client (for GPT-4o-mini chat)
+const openrouter = new OpenAI({
+    apiKey: OPENROUTER_KEY,
+    baseURL: "https://openrouter.ai/api/v1"
 });
 
 const SENSITIVE_ACTIONS = ["remove_last_transaction", "remove_transaction"];
@@ -199,10 +206,25 @@ Se o usuário der uma ORDEM, aí sim use add_transaction, etc.
 Se o usuário pedir para realizar uma ação (ex: "Adicionar R$ 50 em Pizza"), USO OBRIGATÓRIO das ferramentas (tool_calls).
 NÃO responda apenas com texto se houver uma ação a ser feita.
 
-=== MÚLTIPLOS ITENS (CRÍTICO - LEIA COM ATENÇÃO) ===
-Se o usuário listar vários itens, você DEVE gerar uma chamada "add_transaction" SEPARADA para CADA item.
-Exemplo: "Gastei 10 no Uber, 50 no Mercado e 20 na Farmácia" = 3 tool_calls.
-VOCÊ É PROIBIDO DE IGNORAR ITENS. Se ele disse 6 gastos, gere 6 tool_calls. Se disse 10, gere 10.
+=== MÚLTIPLOS ITENS (MÁXIMA PRIORIDADE - CRÍTICO) ===
+⚠️ REGRA ABSOLUTA: Se o usuário mencionar MÚLTIPLAS transações, você DEVE criar uma tool_call SEPARADA para CADA UMA.
+
+EXEMPLO OBRIGATÓRIO:
+Input: "Gastei R$10 no Uber, R$50 no Mercado e R$20 na Farmácia"
+Output CORRETO: 3 tool_calls paralelas:
+  1. add_transaction(amount: 10, description: "Uber", category: "Transporte", ...)
+  2. add_transaction(amount: 50, description: "Mercado", category: "Mercado", ...)
+  3. add_transaction(amount: 20, description: "Farmácia", category: "Saúde", ...)
+
+EXEMPLO 2:
+Input: "Dia 4 paguei R$16 no Stock Center, R$41 na Clipe, R$32 no Bazar, R$71 na Casa Elétrica"
+Output: 4 tool_calls (uma para cada item!)
+
+❌ ERRADO: Gerar apenas 1 tool_call e ignorar os outros itens.
+✅ CERTO: Contar TODOS os valores mencionados e gerar uma tool_call para CADA.
+
+ANTES de responder, CONTE quantos valores em R$ foram mencionados. Esse é o número EXATO de tool_calls que você deve gerar.
+VOCÊ É PROIBIDO DE IGNORAR ITENS. Se ele disse 5 gastos, gere 5 tool_calls. Se disse 10, gere 10.
 NÃO PARE NO MEIO. PROCESSE TODOS OS ITENS ATÉ O FIM.
 
 === DATAS (OBRIGATÓRIO) ===
@@ -210,10 +232,14 @@ SEMPRE extraia a data do que o usuário disse. Se ele disse "dia 30 de dezembro"
 Se ele disse "ontem", calcule baseado na data atual: ${new Date().toLocaleDateString("pt-BR")}.
 Se NÃO houver data mencionada, use a data de HOJE no formato YYYY-MM-DD.
 O campo "date" é OBRIGATÓRIO em toda chamada de add_transaction.
+
+=== FORMATO DE SAÍDA ===
+Quando precisar executar ações, use APENAS o mecanismo de tool_calls fornecido.
+Para respostas de texto, responda normalmente sem usar JSON ou tags especiais.
 `;
         }
 
-        // 3. AI Processing
+        // 3. AI Processing (via OpenRouter with GPT-4o-mini)
         const history = (req as any).history || [];
 
         const messagesPayload = [
@@ -222,12 +248,13 @@ O campo "date" é OBRIGATÓRIO em toda chamada de add_transaction.
             { role: "user", content: userText }
         ];
 
-        const completion = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile", // RESTORED SMART MODEL
+        const completion = await openrouter.chat.completions.create({
+            model: "openai/gpt-4o-mini", // Reliable for function calling
             messages: messagesPayload as any,
             tools: tools as any,
             tool_choice: "auto",
-            max_tokens: 4096, // Ensure enough space for bulk tool calls
+            parallel_tool_calls: true, // Enable multiple tool calls in single response
+            max_tokens: 4096,
         });
 
         const message = completion.choices[0].message;
@@ -245,6 +272,7 @@ O campo "date" é OBRIGATÓRIO em toda chamada de add_transaction.
         let finalMessage = "";
 
         if (toolCalls) {
+            console.log(`[AI API] Received ${toolCalls.length} tool call(s) from AI`);
             const toolResults = [];
 
             for (const toolCall of toolCalls) {

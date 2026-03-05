@@ -16,6 +16,7 @@ import {
 import { TopExpenses } from "@/components/dashboard/TopExpenses";
 import { BalanceChart } from "@/components/dashboard/BalanceChart";
 import { DataBackup } from "@/components/dashboard/DataBackup";
+import { WorkCalendarWidget } from "@/components/dashboard/WorkCalendarWidget";
 
 type WorkProfile = {
     salary: number;
@@ -535,6 +536,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Analysis Row - Layer 3 */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="h-[400px]">
                     {userId && <BalanceChart userId={userId} refreshTrigger={refreshTrigger} initialBalance={profile?.initial_balance || 0} />}
@@ -542,6 +544,11 @@ export default function DashboardPage() {
                 <div className="h-full">
                     {userId && <TopExpenses userId={userId} refreshTrigger={refreshTrigger} />}
                 </div>
+            </div>
+
+            {/* Work Calendar Section */}
+            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                <WorkCalendarWidget />
             </div>
 
             {/* Transactions Side-by-Side */}
